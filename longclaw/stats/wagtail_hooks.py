@@ -1,10 +1,13 @@
 import datetime
 from wagtail.core import hooks
 from wagtail.admin.site_summary import SummaryItem
-from longclaw.orders.models import Order
 from longclaw.stats import stats
 from longclaw.configuration.models import Configuration
 from longclaw.utils import ProductVariant, maybe_get_product_model
+# from longclaw.orders.models import Order
+from django.apps import apps
+from longclaw.settings import ORDER_MODEL
+Order = apps.get_model(*ORDER_MODEL.split('.'))
 
 
 class LongclawSummaryItem(SummaryItem):

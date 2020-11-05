@@ -10,9 +10,14 @@ except ImportError:
 
 from longclaw.shipping.forms import AddressForm
 from longclaw.checkout.forms import CheckoutForm
-from longclaw.checkout.utils import create_order
+# from longclaw.checkout.utils import create_order
 from longclaw.basket.utils import get_basket_items
-from longclaw.orders.models import Order
+# from longclaw.orders.models import Order
+from django.apps import apps
+from longclaw.settings import ORDER_MODEL
+Order = apps.get_model(*ORDER_MODEL.split('.'))
+
+from home.longclaw_basket_utils import create_order
 
 
 @require_GET

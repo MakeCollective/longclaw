@@ -7,7 +7,10 @@ from wagtail.contrib.modeladmin.options import (
 )
 from wagtail.contrib.modeladmin.helpers import ButtonHelper
 from wagtail.contrib.modeladmin.views import InspectView
-from longclaw.orders.models import Order
+# from longclaw.orders.models import Order
+from longclaw.settings import ORDER_MODEL
+from django.apps import apps
+Order = apps.get_model(*ORDER_MODEL.split('.'))
 from longclaw.settings import API_URL_PREFIX
 
 class OrderButtonHelper(ButtonHelper):

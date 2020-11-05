@@ -6,11 +6,13 @@ from ipware.ip import get_real_ip
 from longclaw.basket.utils import get_basket_items, destroy_basket
 from longclaw.shipping.utils import get_shipping_cost
 from longclaw.checkout.errors import PaymentError
-from longclaw.orders.models import Order, OrderItem
+from longclaw.orders.models import OrderItem # Order
 from longclaw.shipping.models import Address
 from longclaw.configuration.models import Configuration
 from longclaw.utils import GATEWAY
-
+from django.apps import apps
+from longclaw.settings import ORDER_MODEL
+Order = apps.get_model(*ORDER_MODEL.split('.'))
 
 def create_order(email,
                  request,

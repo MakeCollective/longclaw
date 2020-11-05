@@ -5,7 +5,10 @@ import itertools
 import calendar
 from datetime import datetime
 from django.db.models import Q, Sum, F
-from longclaw.orders.models import Order, OrderItem
+from longclaw.orders.models import OrderItem # Order
+from django.apps import apps
+from longclaw.settings import ORDER_MODEL
+Order = apps.get_model(*ORDER_MODEL.split('.'))
 
 
 def current_month():

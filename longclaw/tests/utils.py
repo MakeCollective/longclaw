@@ -11,9 +11,12 @@ from wagtail_factories import PageFactory
 
 
 from longclaw.basket.models import BasketItem
-from longclaw.orders.models import Order
 from longclaw.shipping.models import Address, Country, ShippingRate
 from longclaw.utils import ProductVariant, maybe_get_product_model
+# from longclaw.orders.models import Order
+from django.apps import apps
+from longclaw.settings import ORDER_MODEL
+Order = apps.get_model(*ORDER_MODEL.split('.'))
 
 
 @contextmanager

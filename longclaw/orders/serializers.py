@@ -1,7 +1,10 @@
 from rest_framework import serializers
-from longclaw.orders.models import Order, OrderItem
+from longclaw.orders.models import OrderItem # Order
 from longclaw.products.serializers import ProductVariantSerializer
-from longclaw.shipping.serializers import AddressSerializer
+from longclaw.shipping.serializers import AddressSerializer, GSSDeliveryRegionSerializer
+from django.apps import apps
+from longclaw.settings import ORDER_MODEL
+Order = apps.get_model(*ORDER_MODEL.split('.'))
 
 class OrderItemSerializer(serializers.ModelSerializer):
 

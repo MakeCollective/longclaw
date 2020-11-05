@@ -1,8 +1,11 @@
 from rest_framework.decorators import action 
 from rest_framework import permissions, status, viewsets
 from rest_framework.response import Response
-from longclaw.orders.models import Order
+# from longclaw.orders.models import Order
 from longclaw.orders.serializers import OrderSerializer
+from django.apps import apps
+from longclaw.settings import ORDER_MODEL
+Order = apps.get_model(*ORDER_MODEL.split('.'))
 
 
 class OrderViewSet(viewsets.ModelViewSet):
