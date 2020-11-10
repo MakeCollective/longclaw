@@ -52,6 +52,7 @@ class CheckoutView(TemplateView):
         return context
 
     def post(self, request, *args, **kwargs):
+        
         context = self.get_context_data(**kwargs)
         checkout_form = context['checkout_form']
         shipping_form = context['shipping_form']
@@ -69,6 +70,10 @@ class CheckoutView(TemplateView):
                     billing_address = billing_form.save()
             else:
                 billing_address = shipping_address
+        
+        gss_delivery_region = None
+        if request.POST.get('gss_delivery_region'):
+            gss_delivery_region = request.POST.get('gss_delivery_region')
 
         if all_ok:
             order = create_order(
@@ -77,7 +82,8 @@ class CheckoutView(TemplateView):
                 shipping_address=shipping_address,
                 billing_address=billing_address,
                 shipping_option=shipping_option,
-                capture_payment=True
+                capture_payment=True,
+                gss_delivery_region=gss_delivery_region,
             )
             return HttpResponseRedirect(reverse(
                 'longclaw_checkout_success',

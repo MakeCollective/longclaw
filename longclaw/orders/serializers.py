@@ -20,6 +20,12 @@ class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True)
     shipping_address = AddressSerializer()
     total = serializers.SerializerMethodField()
+    gss_delivery_region = GSSDeliveryRegionSerializer()
+
+    def to_representation(self, value):
+        rep = super().to_representation(value)
+        rep['shipping_statuses'] = [choice for choice, _ in Order._meta.get_field('shipping_status').choices]
+        return rep
 
     class Meta:
         model = Order

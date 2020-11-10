@@ -12,6 +12,15 @@ class ProductVariantSerializer(serializers.ModelSerializer):
 
     product = ProductSerializer()
 
+    def to_representation(self, value):
+        rep = super().to_representation(value)
+        rep['grind'] = str(value.grind)
+        rep['weight'] = str(value.weight)
+        rep['price'] = value.price
+        if value.product.first_image:
+            rep['thumbnail'] = value.product.first_image.image.get_rendition('width-200').url
+        return rep
+
     class Meta:
         model = ProductVariant
         fields = "__all__"

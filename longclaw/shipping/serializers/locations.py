@@ -12,3 +12,10 @@ class CountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Country
         fields = "__all__"
+
+class GSSDeliveryRegionSerializer(serializers.Serializer):
+    def to_representation(self, value):
+        return {
+            'name': value.name,
+        }
+

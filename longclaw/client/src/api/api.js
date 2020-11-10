@@ -258,11 +258,16 @@ export const addressDetail = new ApiEndpoint('addresses/{id}/');
 export const requestsList = new ApiEndpoint('requests/');
 //List product requests for a single variant
 export const requestVariantList = new ApiEndpoint('requests/variant/{id}/');
+// Send order to 3pl (GSS)
+export const sendToGss = new ApiEndpoint('order/{id}/sendToGss/');
+// Update shipping status
+export const updateShippingStatus = new ApiEndpoint('order/{id}/updateShippingStatus/{shipping_status}');
 
 export default {
   orderDetail, fulfillOrder, refundOrder, checkout,
   checkoutToken, basketList, basketListCount,
   basketDetailCount, basketDetail, shippingCost,
   shippingCountries, shippingCountryOptions,
-  addressList, addressDetail, requestsList, requestVariantList
+  addressList, addressDetail, requestList: requestsList, requestVariantList,
+  sendToGss, updateShippingStatus,
 }

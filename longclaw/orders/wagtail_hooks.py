@@ -94,9 +94,9 @@ class OrderModelAdmin(ModelAdmin):
     menu_icon = 'list-ul'
     add_to_settings_menu = False
     exclude_from_explorer = False
-    list_display = ('id', 'status', 'status_note', 'email',
-                    'payment_date', 'total_items', 'total')
-    list_filter = ('status', 'payment_date', 'email')
+    list_display = ('id', 'status', 'email', # status_note
+                    'payment_date', 'total_items', 'total', 'gss_delivery_region')
+    list_filter = ('status', 'payment_date', 'email', 'gss_delivery_region')
     inspect_view_enabled = True
     detail_view_class = DetailView
     button_helper_class = OrderButtonHelper

@@ -27,6 +27,19 @@ class OrderDetail extends Component {
       urlParams: { id: this.props.orderId }}).then(this.fetchOrder())
   }
 
+  handleGssOrderSubmit() {
+    api.sendToGss.post({
+      prefix: this.props.urlPrefix,
+      urlParams: { id: this.props.orderId }}).then(this.fetchOrder())
+  }
+
+  handleShippingStatusChange(e) {
+    api.updateShippingStatus.post({
+      prefix: this.props.urlPrefix,
+      urlParams: { id: this.props.orderId, shipping_status: e.target.value }
+    }).then(this.fetchOrder())
+  }
+
   fetchOrder() {
     this.setState({ loading: true })
     api.orderDetail.get({
@@ -64,6 +77,14 @@ class OrderDetail extends Component {
       borderRadius: '3px',
       marginRight: '15px'
     };
+    const selectStyle = {
+      fontSize: '0.95em',
+      marginLeft: '1em',
+      width: 'auto',
+      fontFamily: 'Open Sans,Arial,sans-serif',
+      fontWeight: 400,
+      textTransform: 'uppercase',
+    };
     let status = <span className="icon icon-warning">UNKNOWN&nbsp;</span>;
     let refundBtn = (
       <button
@@ -74,6 +95,29 @@ class OrderDetail extends Component {
         Refund
       </button>
     );
+    let sendToGssBtn = (
+      <button
+        onClick={() => this.handleGssOrderSubmit()}
+        className="button button-secondary"
+      >
+        Send to 3PL
+      </button> 
+    );
+    let shippingStatusOptions = order.shipping_statuses.map((x) => {
+      if (x == order.shipping_status) {
+        return <option value={x} selected>{x}</option>
+      } else {
+        return <option value={x}>{x}</option>;
+      }
+    })
+    let shippingStatusSelect = (
+      <select 
+        style={selectStyle}
+        onChange={(e) => {this.handleShippingStatusChange(e)}}
+      >
+        {shippingStatusOptions}
+      </select>
+    )
 
     if (order.status == 1) {
       status = (
@@ -83,6 +127,8 @@ class OrderDetail extends Component {
                   </span>
           <button onClick={() => this.handleFulfill()} className="button yes">Fulfill</button>
           {refundBtn}
+          {sendToGssBtn}
+          {shippingStatusSelect}
         </div>
       );
     }
@@ -93,6 +139,8 @@ class OrderDetail extends Component {
             FULFILLED&nbsp;
                   </span>
           {refundBtn}
+          {sendToGssBtn}
+          {shippingStatusSelect}
         </div>
       );
     }
@@ -113,6 +161,7 @@ class OrderDetail extends Component {
         <OrderSummary
           order={order}
           shippingAddress={order.shipping_address}
+          gss_delivery_region={order.gss_delivery_region}
         />
         <h2>Order Items</h2>
         <OrderItems

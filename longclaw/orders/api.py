@@ -28,3 +28,15 @@ class OrderViewSet(viewsets.ModelViewSet):
         order = Order.objects.get(id=pk)
         order.fulfill()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=['post'])
+    def send_to_gss(self, request, pk):
+        order = Order.objects.get(id=pk)
+        order.send_to_gss()
+        return Response(status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=['post'])
+    def update_shipping_status(self, request, pk, shipping_status):
+        order = Order.objects.get(id=pk)
+        order.update_shipping_status(shipping_status)
+        return Response(status.HTTP_204_NO_CONTENT)

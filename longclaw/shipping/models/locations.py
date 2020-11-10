@@ -7,8 +7,8 @@ from wagtail.snippets.models import register_snippet
 @register_snippet
 class Address(models.Model):
     name = models.CharField(max_length=64)
-    line_1 = models.CharField(max_length=128)
-    line_2 = models.CharField(max_length=128, blank=True)
+    line_1 = models.CharField(max_length=128, blank=True)
+    line_2 = models.CharField(max_length=128)
     city = models.CharField(max_length=64)
     postcode = models.CharField(max_length=10)
     country = models.ForeignKey('shipping.Country', blank=True, null=True, on_delete=models.PROTECT)

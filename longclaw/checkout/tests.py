@@ -16,11 +16,13 @@ from longclaw.tests.utils import (
     OrderFactory
 )
 from longclaw.shipping.models import ShippingRate
-from longclaw.checkout.utils import create_order
+# from longclaw.checkout.utils import create_order
 from longclaw.checkout.forms import CheckoutForm
 from longclaw.checkout.views import CheckoutView
 from longclaw.checkout.templatetags import longclawcheckout_tags as tags
 from longclaw.basket.utils import basket_id
+
+from home.longclaw_basket_utils import create_order
 
 
 class CheckoutApiTest(LongclawTestCase):

@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 import moment from 'moment';
 
-const OrderSummary = ({order, shippingAddress}) => (
+const OrderSummary = ({order, shippingAddress, gss_delivery_region}) => (
   <div className="row">
     <div className="col4">
       <dl>
@@ -14,6 +14,7 @@ const OrderSummary = ({order, shippingAddress}) => (
           <address>
             {shippingAddress.name}<br />
             {shippingAddress.line_1}<br />
+            {shippingAddress.line_2}<br />
             {shippingAddress.city}<br />
             {shippingAddress.postcode}<br />
             {shippingAddress.country}<br />
@@ -39,6 +40,18 @@ const OrderSummary = ({order, shippingAddress}) => (
         <dt>{order.status_note}</dt>
       </dl>
     </div>
+    <div className="col4">
+      <dl>
+        <dt>GSS Delivery Region</dt>
+        <dt>{gss_delivery_region.name}</dt>
+      </dl>
+    </div>
+    <div className="col4">
+      <dl>
+        <dt>Shipping status</dt>
+        <dt>{order.shipping_status}</dt>
+      </dl>
+    </div>
   </div>
 );
 
@@ -47,7 +60,9 @@ OrderSummary.propTypes = {
     payment_date: PropTypes.string,
     email: PropTypes.string,
     status_note: PropTypes.string,
-    transaction_id: PropTypes.string
+    transaction_id: PropTypes.string,
+    gss_delivery_region: PropTypes.string,
+    shipping_status: PropTypes.string,
   }).isRequired,
   shippingAddress: PropTypes.shape({
     name: PropTypes.string,
@@ -55,7 +70,10 @@ OrderSummary.propTypes = {
     city: PropTypes.string,
     postcode: PropTypes.string,
     country: PropTypes.string
-  }).isRequired
+  }).isRequired,
+  gss_delivery_region: PropTypes.shape({
+    name: PropTypes.string,
+  })
 }
 
 export default OrderSummary;
