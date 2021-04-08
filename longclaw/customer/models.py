@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 from wagtail.snippets.models import register_snippet
 
@@ -36,6 +37,23 @@ class CustomerPaymentMethod(models.Model):
 
     def __str__(self):
         return f'{self.name}'
+
+    def check_valid(self):
+        try:
+            import stripe
+        except Exception as e:
+            raise e
+
+        stripe.api_key = settings.STRIPE_SECRET
+        if not stripe.api_key:
+            raise ValueError('STRIPE_SECRET has not been provided')
+        
+        try:
+            pm = stripe.PaymentMethod.retrieve(self.stripe_id)
+        except Exception as e:
+            raise e
+
+        return True
     
 
 class Subscription(models.Model):
