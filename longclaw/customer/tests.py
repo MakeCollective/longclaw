@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.conf import settings
 
 from longclaw.shipping.models.locations import Address, Country
 from longclaw.customer.models import (
@@ -36,10 +37,43 @@ class CustomerTestCase(TestCase):
         customer = Customer.objects.get(name='Jeff Tester')
     
 
+class CustomerPaymentMethodTestCase(TestCase):
+    def setUp(self):
+        customer = Customer.objects.create(
+            name='Bloke Gilmoe',
+            email='bloke_gilmoe@make.nz',
+            phone='0212345678',
+            stripe_customer_id='cus_JGFFKICO07bpLL',
+        )
+        self.customer_payment_method = CustomerPaymentMethod.objects.create(
+            customer=customer,
+            name='Test payment method',
+            stripe_id='pm_1IdikrHdGXKihVkiz44IHKkrX',
+        )
 
-# name = models.CharField(max_length=64)
-# line_1 = models.CharField(max_length=128)
-# line_2 = models.CharField(max_length=128, blank=True)
-# city = models.CharField(max_length=64)
-# postcode = models.CharField(max_length=10)
-# cou
+    def test_payment_method_exists(self):
+        self.customer_payment_method.check_valid()
+
+
+class MissingStripeSecretTestCase(TestCase):
+    ''' This test case kind of relies on that Stripe has been pip installed '''
+    def setUp(self):
+        customer = Customer.objects.create(
+            name='Bloke Gilmoe',
+            email='bloke_gilmoe@make.nz',
+            phone='0212345678',
+            stripe_customer_id='cus_abc123',
+        )
+        self.customer_payment_method = CustomerPaymentMethod.objects.create(
+            customer=customer,
+            name='Test payment method',
+            stripe_id='pm_abc123',
+        )
+
+    def test_missing_stripe_key(self):
+        del settings.STRIPE_SECRET
+        self.assertRaises(AttributeError, self.customer_payment_method.check_valid)
+
+    def test_empty_stripe_key(self):
+        settings.STRIPE_SECRET = ''
+        self.assertRaises(ValueError, self.customer_payment_method.check_valid)
