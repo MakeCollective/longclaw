@@ -1,12 +1,25 @@
 from django.db import models
 
+from longclaw.shipping.models.locations import Address
+
 
 class Customer(models.Model):
     '''
     Hold details about a user. Details include at a minimum the amount of information
     to perform a transaction through Stripe
     '''
-    pass
+    name = models.CharField(max_length=50)
+    email = models.EmailField(max_length=255)
+    phone = models.CharField(max_length=20)
+    company_name = models.CharField(max_length=100, blank=True, null=True)
+    shipping_address = models.ForeignKey('shipping.models.locations.Address', on_delete=models.SET_NULL, blank=True, null=True)
+    billing_address = models.ForiegnKey('shipping.models.locations.Address', on_delete=models.SET_NULL, blank=True, null=True)
+    stripe_customer_id = models.CharField(max_length=255, blank=True, null=True)
+    active_payment_method = models.ForiegnKey('customer.CustomerPaymentMethod', on_delete=models.SET_NULL, blank=True, null=True)
+
+    # Related fields
+    # CustomerPaymentMethod(s)
+    # Future proofing in case a Customer will have multiple payment methods (cards)
 
 
 class CustomerPaymentMethod(models.Model):
