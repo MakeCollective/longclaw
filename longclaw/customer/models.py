@@ -1,8 +1,11 @@
 from django.db import models
 
+from wagtail.snippets.models import register_snippet
+
 from longclaw.shipping.models.locations import Address
 
 
+@register_snippet
 class Customer(models.Model):
     '''
     Hold details about a user. Details include at a minimum the amount of information
