@@ -3,6 +3,8 @@ from django.conf import settings
 
 from wagtail.snippets.models import register_snippet
 
+from datetime import datetime
+
 from longclaw.shipping.models.locations import Address
 
 
@@ -71,6 +73,27 @@ class Subscription(models.Model):
     subscription_order = models.ForeignKey('customer.SubscriptionOrder', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
     active = models.BooleanField(default=False, help_text='Whether or not this subscription should be dispatched as normal')
 
+    def __str__(self):
+        return f'{self.id} - {self.customer}'
+    
+    def activate(self):
+        self.active = True
+        self.save()
+    
+    def cancel(self):
+        self.active = False
+        self.save()
+    
+    def update_next_dispatch(self, date):
+        self.next_dispatch = date
+        self.save()
+    
+    def update_repeat_period(self, period):
+        self.repeat_period = period
+        self.save()
+    
+
+    
 
 class SubscriptionOrder(models.Model):
     pass
