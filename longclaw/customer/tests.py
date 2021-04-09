@@ -48,7 +48,7 @@ class CustomerPaymentMethodTestCase(TestCase):
         self.customer_payment_method = CustomerPaymentMethod.objects.create(
             customer=customer,
             name='Test payment method',
-            stripe_id='pm_1IdikrHdGXKihVkiz44IHKkrX',
+            stripe_id='pm_1IdikrHdGXKihVkiz44IHKkr',
         )
 
     def test_payment_method_exists(self):
@@ -77,3 +77,19 @@ class MissingStripeSecretTestCase(TestCase):
     def test_empty_stripe_key(self):
         settings.STRIPE_SECRET = ''
         self.assertRaises(ValueError, self.customer_payment_method.check_valid)
+
+
+class SubscriptionTestCase(TestCase):
+    def setUp(self):
+        customer = Customer.objects.create(
+            name='Bloke Gilmoe',
+            email='bloke_gilmoe@make.nz',
+            phone='0212345678',
+            stripe_customer_id='cus_abc123',
+        )
+        self.subscription = Subscription.objects.create(
+            customer=customer,
+        )
+    
+    def test_check_subscription_exists(self):
+        assert isinstance(self.subscription, Subscription)
