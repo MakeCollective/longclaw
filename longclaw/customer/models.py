@@ -63,7 +63,6 @@ class CustomerPaymentMethod(models.Model):
 class Subscription(models.Model):
     ''' 
     Holds information relating to a single subscription
-
     '''
     customer = models.ForeignKey('customer.Customer', related_name='subscriptions', on_delete=models.SET_NULL, blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
@@ -72,7 +71,6 @@ class Subscription(models.Model):
     next_dispatch = models.DateTimeField(blank=True, null=True)
     repeat_period = models.IntegerField(blank=True, null=True, help_text='The amount of days until the order is to be repeated')
     one_click_reminder = models.BooleanField(default=False, help_text='Whether or not to require a customer confirmation before dispatching the order')
-    subscription_order = models.ForeignKey('customer.SubscriptionOrder', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
     active = models.BooleanField(default=False, help_text='Whether or not this subscription should be dispatched as normal')
 
     def __str__(self):
@@ -98,7 +96,23 @@ class Subscription(models.Model):
     
 
 class SubscriptionOrder(models.Model):
-    pass
+    '''
+    Hold Order specific information and be the model to relate the OrderItems to.
+    Has a one-to-one relationship with a Subscription.
+    '''
+    subscription = models.OneToOneField('customer.SubscriptionOrder', related_name='subscription_order', on_delete=models.CASCADE)
+    
+    # shipping address
+    # can have a shipping address specific to the order, will default to the Customer's
+    # shipping address if one is not set
+    shipping_address = models.ForeignKey('shipping.Address', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
+
+
+    def get_shipping_address(self):
+        if not self.shipping_address:
+            return self.subscription.shipping_address
+        else:
+            return self.shipping_address
 
 
 class SubscriptionOrderItem(models.Model):
