@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.contrib.auth.models import User
 
 from wagtail.snippets.models import register_snippet
 
@@ -12,6 +13,7 @@ class Customer(models.Model):
     Hold details about a user. Details include at a minimum the amount of information
     to perform a transaction through Stripe
     '''
+    user = models.ForeignKey(User, related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
     name = models.CharField(max_length=50)
     email = models.EmailField(max_length=255)
     phone = models.CharField(max_length=20)
