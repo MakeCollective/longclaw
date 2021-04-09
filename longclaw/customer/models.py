@@ -57,7 +57,19 @@ class CustomerPaymentMethod(models.Model):
     
 
 class Subscription(models.Model):
-    pass
+    ''' 
+    Holds information relating to a single subscription
+
+    '''
+    customer = models.ForeignKey('customer.Customer', related_name='subscriptions', on_delete=models.SET_NULL, blank=True, null=True)
+    created = models.DateTimeField(auto_now_add=True)
+    last_modified = models.DateTimeField(auto_now=True)
+    last_dispatch = models.DateTimeField(blank=True, null=True)
+    next_dispatch = models.DateTimeField(blank=True, null=True)
+    repeat_period = models.IntegerField(blank=True, null=True, help_text='The amount of days until the order is to be repeated')
+    one_click_reminder = models.BooleanField(default=False, help_text='Whether or not to require a customer confirmation before dispatching the order')
+    subscription_order = models.ForeignKey('customer.SubscriptionOrder', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
+    active = models.BooleanField(default=False, help_text='Whether or not this subscription should be dispatched as normal')
 
 
 class SubscriptionOrder(models.Model):
