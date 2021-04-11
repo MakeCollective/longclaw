@@ -129,4 +129,33 @@ class SubscriptionOrderTestCase(TestCase):
         self.subscription_order.cancel()
         assert self.subscription_order.status == SubscriptionOrder.CANCELLED
 
-        
+
+class SubscriptionOrderItemTestCase(TestCase):
+    def setUp(self):
+        customer = Customer.objects.create(
+            name='Bloke Gilmoe',
+            email='bloke_gilmore@make.nz',
+            phone='0212345678',
+            stripe_customer_id='cus_abc123',
+        )
+        subscription = Subscription.objects.create(
+            customer=customer,
+        )
+        self.subscription_order = SubscriptionOrder.objects.create(
+            # Don't think anything is required
+            subscription=subscription,
+        )
+        test_product_variant = settings.PRODUCT_VARIANT_MODEL.objects.create(
+            base_price='10',
+            ref='test_product',
+            stock=100,
+        )
+        self.subscription_order_item = SubscriptionOrderItem.objects.create(
+            order=self.subscription_order,
+            quantity=5,
+            product=test_product_variant,
+        )
+
+    def test_check_subscription_order_item_exists(self):
+        assert isinstance(self.subscription_order_item, SubscriptionOrderItem)
+    
