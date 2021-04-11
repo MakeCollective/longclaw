@@ -212,4 +212,16 @@ class SubscriptionOrder(models.Model):
 
 
 class SubscriptionOrderItem(models.Model):
-    pass
+    '''
+    An individual item model that holds quantity and a reference to the product variant
+    '''
+    product = models.ForeignKey(settings.PRODUCT_VARIANT_MODEL, on_delete=models.DO_NOTHING)
+    quantity = models.IntegerField(default=1)
+    order = models.ForeignKey('customer.SubscriptionOrder', related_name='items', on_delete=models.CASCADE)
+
+    @property
+    def total(self):
+        return self.quantity * self.product.price
+
+    def __str__(self):
+        return f'{self.quantity} x {self.product.get_product_title()}'
