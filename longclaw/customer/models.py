@@ -100,19 +100,115 @@ class SubscriptionOrder(models.Model):
     Hold Order specific information and be the model to relate the OrderItems to.
     Has a one-to-one relationship with a Subscription.
     '''
-    subscription = models.OneToOneField('customer.SubscriptionOrder', related_name='subscription_order', on_delete=models.CASCADE)
+    SUBMITTED = 1
+    FULFILLED = 2
+    CANCELLED = 3
+    REFUNDED = 4
+    FAILURE = 5
+    ORDER_STATUSES = (
+        (SUBMITTED, 'Submitted'),
+        (FULFILLED, 'Fulfilled'),
+        (CANCELLED, 'Cancelled'),
+        (REFUNDED, 'Refunded'),
+        (FAILURE, 'Payment Failed')
+    )
     
+    subscription = models.OneToOneField('customer.Subscription', related_name='subscription_order', on_delete=models.CASCADE)
+    
+    payment_date = models.DateTimeField(blank=True, null=True)
+    created_date = models.DateTimeField(auto_now_add=True)
+    status = models.IntegerField(choices=ORDER_STATUSES, default=SUBMITTED)
+    status_note = models.CharField(max_length=128, blank=True, null=True)
+    transaction_id = models.CharField(max_length=255, blank=True, null=True)
+
+    # contact info
+    email = models.EmailField(max_length=255, blank=True, null=True)
+    ip_address = models.GenericIPAddressField(blank=True, null=True)
+
     # shipping address
     # can have a shipping address specific to the order, will default to the Customer's
-    # shipping address if one is not set
+    # shipping address if one is not set, same with billing address
+    # shipping info
     shipping_address = models.ForeignKey('shipping.Address', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
 
+    # billing info
+    billing_address = models.ForeignKey('shipping.Address', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
+
+    shipping_rate = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
+
+    def __str__(self):
+        return f'Order #{self.id} - {self.email}'
+    
+    @property
+    def total(self):
+        '''
+        Total cost of the order
+        '''
+        total = 0
+        for item in self.items.all():
+            total += item.total
+        return round(total, 2)
+
+    @property
+    def final_payment(self):
+        '''
+        The total payment received
+        This includes the total price (reduced by any discount applied), plus shipping
+        '''
+        total = self.total
+        if self.shipping_rate:
+            total += self.shipping_rate
+        if self.discounts.first():
+            total, _ = discount_total(total, self.discounts.first())
+        return round(total, 2)
+
+    @property
+    def total_items(self):
+        '''
+        The number of individual items on the order
+        '''
+        return self.items.count()
+    
+    def refund(self):
+        '''
+        TODO
+        '''
+        pass
+
+    def fulfill(self):
+        '''
+        Mark this order as being fulfilled
+        '''
+        self.status = self.FULFILLED
+        self.save()
+    
+    def unfulfill(self):
+        '''
+        Unmark this order as being fulfilled, set it back to the default (Submitted)
+        '''
+        self.status = self.SUBMITTED
+        self.save()
+    
+    def cancel(self, refund=True):
+        '''
+        Cancel this order, optionally refunding it
+        '''
+        if refund:
+            self.refund()
+        self.status = self.CANCELLED
+        self.save()
 
     def get_shipping_address(self):
         if not self.shipping_address:
             return self.subscription.shipping_address
         else:
             return self.shipping_address
+    
+    def get_billing_address(self):
+        if not self.billing_address:
+            return self.subscription.billing_address
+        else:
+            return self.billing_address
 
 
 class SubscriptionOrderItem(models.Model):
