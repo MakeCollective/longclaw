@@ -93,3 +93,40 @@ class SubscriptionTestCase(TestCase):
     
     def test_check_subscription_exists(self):
         assert isinstance(self.subscription, Subscription)
+
+
+class SubscriptionOrderTestCase(TestCase):
+    def setUp(self):
+        customer = Customer.objects.create(
+            name='Bloke Gilmoe',
+            email='bloke_gilmore@make.nz',
+            phone='0212345678',
+            stripe_customer_id='cus_abc123',
+        )
+        subscription = Subscription.objects.create(
+            customer=customer,
+        )
+        self.subscription_order = SubscriptionOrder.objects.create(
+            # Don't think anything is required
+            subscription=subscription,
+        )
+    
+    def test_check_subscription_order_exists(self):
+        assert isinstance(self.subscription_order, SubscriptionOrder)
+    
+    def test_check_default_status(self):
+        assert self.subscription_order.status == SubscriptionOrder.SUBMITTED
+    
+    def test_fulfill(self):
+        self.subscription_order.fulfill()
+        assert self.subscription_order.status == SubscriptionOrder.FULFILLED
+    
+    def test_unfulfill(self):
+        self.subscription_order.unfulfill()
+        assert self.subscription_order.status == SubscriptionOrder.SUBMITTED
+    
+    def test_cancelled(self):
+        self.subscription_order.cancel()
+        assert self.subscription_order.status == SubscriptionOrder.CANCELLED
+
+        
