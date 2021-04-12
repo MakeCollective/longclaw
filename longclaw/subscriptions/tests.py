@@ -2,7 +2,10 @@ from django.test import TestCase
 from django.conf import settings
 from django.apps import apps
 
-from longclaw.subscriptions import (
+from wagtail.core.models import Page
+
+from longclaw.customers.models import Customer
+from longclaw.subscriptions.models import (
     Subscription, SubscriptionOrder, SubscriptionOrderItem,
 )
 
