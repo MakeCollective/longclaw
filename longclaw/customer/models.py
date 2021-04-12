@@ -4,8 +4,6 @@ from django.contrib.auth.models import User
 
 from wagtail.snippets.models import register_snippet
 
-from datetime import datetime
-
 from longclaw.shipping.models.locations import Address
 
 
