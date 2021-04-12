@@ -1,5 +1,8 @@
 from django.test import TestCase
 from django.conf import settings
+from django.apps import apps
+
+from wagtail.core.models import Page
 
 from longclaw.shipping.models.locations import Address, Country
 from longclaw.customer.models import (
@@ -145,10 +148,21 @@ class SubscriptionOrderItemTestCase(TestCase):
             # Don't think anything is required
             subscription=subscription,
         )
-        test_product_variant = settings.PRODUCT_VARIANT_MODEL.objects.create(
-            base_price='10',
+
+        product_variant_model = apps.get_model(
+            app_label=settings.PRODUCT_VARIANT_MODEL.split('.')[0], 
+            model_name=settings.PRODUCT_VARIANT_MODEL.split('.')[1]
+        )
+
+        home_page = Page.objects.first().get_children().first()
+        test_product_model = product_variant_model._meta.get_field('product').related_model
+        test_product = test_product_model(title='Test product', description='Test product')
+        home_page.add_child(instance=test_product)
+        test_product_variant = product_variant_model.objects.create(
+            base_price=10,
             ref='test_product',
             stock=100,
+            product=test_product,
         )
         self.subscription_order_item = SubscriptionOrderItem.objects.create(
             order=self.subscription_order,
@@ -158,4 +172,15 @@ class SubscriptionOrderItemTestCase(TestCase):
 
     def test_check_subscription_order_item_exists(self):
         assert isinstance(self.subscription_order_item, SubscriptionOrderItem)
+
+    def test_order_item_quantity(self):
+        assert self.subscription_order_item.quantity == 5
+    
+    def test_order_item_total(self):
+        self.subscription_order_item.quantity = 5
+        self.subscription_order_item.product.base_price = 20
+        assert self.subscription_order_item.total == 100
+    
+    def test_order_item_total2(self):
+        assert self.subscription_order_item.total == self.subscription_order_item.quantity * self.subscription_order_item.product.price
     
