@@ -6,7 +6,7 @@ class Subscription(models.Model):
     ''' 
     Holds information relating to a single subscription
     '''
-    customer = models.ForeignKey('customers.Customer', related_name='subscriptions', on_delete=models.SET_NULL, blank=True, null=True)
+    account = models.ForeignKey('account.Account', related_name='subscriptions', on_delete=models.SET_NULL, blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
     last_modified = models.DateTimeField(auto_now=True)
     last_dispatch = models.DateTimeField(blank=True, null=True)
@@ -16,7 +16,7 @@ class Subscription(models.Model):
     active = models.BooleanField(default=False, help_text='Whether or not this subscription should be dispatched as normal')
 
     def __str__(self):
-        return f'{self.id} - {self.customer}'
+        return f'{self.id} - {self.account}'
     
     def activate(self):
         self.active = True
@@ -68,7 +68,7 @@ class SubscriptionOrder(models.Model):
     ip_address = models.GenericIPAddressField(blank=True, null=True)
 
     # shipping address
-    # can have a shipping address specific to the order, will default to the Customer's
+    # can have a shipping address specific to the order, will default to the Account's
     # shipping address if one is not set, same with billing address
     # shipping info
     shipping_address = models.ForeignKey('shipping.Address', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)

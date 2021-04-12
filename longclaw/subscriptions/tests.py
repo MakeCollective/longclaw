@@ -4,7 +4,7 @@ from django.apps import apps
 
 from wagtail.core.models import Page
 
-from longclaw.customers.models import Customer
+from longclaw.account.models import Account
 from longclaw.subscriptions.models import (
     Subscription, SubscriptionOrder, SubscriptionOrderItem,
 )
@@ -12,14 +12,14 @@ from longclaw.subscriptions.models import (
 
 class SubscriptionTestCase(TestCase):
     def setUp(self):
-        customer = Customer.objects.create(
+        account = Account.objects.create(
             name='Bloke Gilmoe',
             email='bloke_gilmoe@make.nz',
             phone='0212345678',
             stripe_customer_id='cus_abc123',
         )
         self.subscription = Subscription.objects.create(
-            customer=customer,
+            account=account,
         )
     
     def test_check_subscription_exists(self):
@@ -28,14 +28,14 @@ class SubscriptionTestCase(TestCase):
 
 class SubscriptionOrderTestCase(TestCase):
     def setUp(self):
-        customer = Customer.objects.create(
+        account = Account.objects.create(
             name='Bloke Gilmoe',
             email='bloke_gilmore@make.nz',
             phone='0212345678',
             stripe_customer_id='cus_abc123',
         )
         subscription = Subscription.objects.create(
-            customer=customer,
+            account=account,
         )
         self.subscription_order = SubscriptionOrder.objects.create(
             # Don't think anything is required
@@ -63,14 +63,14 @@ class SubscriptionOrderTestCase(TestCase):
 
 class SubscriptionOrderItemTestCase(TestCase):
     def setUp(self):
-        customer = Customer.objects.create(
+        account = Account.objects.create(
             name='Bloke Gilmoe',
             email='bloke_gilmore@make.nz',
             phone='0212345678',
             stripe_customer_id='cus_abc123',
         )
         subscription = Subscription.objects.create(
-            customer=customer,
+            account=account,
         )
         self.subscription_order = SubscriptionOrder.objects.create(
             # Don't think anything is required

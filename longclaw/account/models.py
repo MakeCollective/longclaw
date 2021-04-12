@@ -6,7 +6,7 @@ from wagtail.snippets.models import register_snippet
 
 
 @register_snippet
-class Customer(models.Model):
+class Account(models.Model):
     '''
     Hold details about a user. Details include at a minimum the amount of information
     to perform a transaction through Stripe
@@ -19,19 +19,19 @@ class Customer(models.Model):
     shipping_address = models.ForeignKey('shipping.Address', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
     billing_address = models.ForeignKey('shipping.Address', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
     stripe_customer_id = models.CharField(max_length=255, blank=True, null=True)
-    active_payment_method = models.ForeignKey('customers.CustomerPaymentMethod', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
+    active_payment_method = models.ForeignKey('account.AccountPaymentMethod', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
 
     # Related fields
-    # CustomerPaymentMethod(s)
-    # Future proofing in case a Customer will have multiple payment methods (cards)
+    # AccountPaymentMethod(s)
+    # Future proofing in case an Account will have multiple payment methods (cards)
 
 
-class CustomerPaymentMethod(models.Model):
+class AccountPaymentMethod(models.Model):
     '''
-    Hold details about a Customer's (potentially) multiple payment methods (cards)
-    Must be attached to a Customer. If the attached Customer is deleted, so are it's related PaymentMethods
+    Hold details about an Account's (potentially) multiple payment methods (cards)
+    Must be attached to an Account. If the attached Account is deleted, so are it's related PaymentMethods
     '''
-    customer = models.ForeignKey('customers.Customer', related_name='payment_methods', on_delete=models.CASCADE)
+    account = models.ForeignKey('account.Account', related_name='payment_methods', on_delete=models.CASCADE)
     name = models.CharField(max_length=255, help_text='User friendly name for the payment method')
     stripe_id = models.CharField(max_length=255)
 
