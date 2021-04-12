@@ -230,6 +230,8 @@ class ApiEndpoint {
 export const orderDetail = new ApiEndpoint('order/{id}/');
 // Mark an order as fulfilled
 export const fulfillOrder = new ApiEndpoint('order/{id}/fulfill/');
+// Unmark an order as fulfilled
+export const unfulfillOrder = new ApiEndpoint('order/{id}/unfulfill/');
 // Refund an order
 export const refundOrder = new ApiEndpoint('order/{id}/refund/');
 // Create an order
@@ -251,18 +253,19 @@ export const shippingCountries = new ApiEndpoint('shipping/countries/');
 // Get a list of shipping options for a country
 export const shippingCountryOptions = new ApiEndpoint('shipping/countries/{country}/');
 // Get list of addresses/post a new address
-export const addressList = new ApiEndpoint('addresses/');
-// get/update/delete address
-export const addressDetail = new ApiEndpoint('addresses/{id}/');
-//List/Post new product request
+// export const addressList = new ApiEndpoint('addresses/');
+// // get/update/delete address
+// export const addressDetail = new ApiEndpoint('addresses/{id}/');
+// //List/Post new product request
 export const requestsList = new ApiEndpoint('requests/');
 //List product requests for a single variant
 export const requestVariantList = new ApiEndpoint('requests/variant/{id}/');
 
 export default {
-  orderDetail, fulfillOrder, refundOrder, checkout,
+  orderDetail, fulfillOrder, unfulfillOrder, refundOrder, checkout,
   checkoutToken, basketList, basketListCount,
   basketDetailCount, basketDetail, shippingCost,
   shippingCountries, shippingCountryOptions,
-  addressList, addressDetail, requestsList, requestVariantList
+  // addressList, addressDetail, 
+  requestsList, requestVariantList
 }

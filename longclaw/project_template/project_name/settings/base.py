@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'longclaw.checkout',
     'longclaw.basket',
     'longclaw.stats',
+    'longclaw.coupon',
 
     'home',
     'search',
@@ -64,7 +65,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
 
-    'wagtail.core.middleware.SiteMiddleware',
     'wagtail.contrib.redirects.middleware.RedirectMiddleware',
 ]
 

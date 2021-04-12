@@ -21,6 +21,12 @@ class OrderDetail extends Component {
       urlParams: { id: this.props.orderId }}).then(this.fetchOrder())
   }
 
+  handleUnfulfill() {
+    api.unfulfillOrder.post({
+      prefix: this.props.urlPrefix,
+      urlParams: { id: this.props.orderId }}).then(this.fetchOrder())
+  }
+
   handleRefund() {
     api.refundOrder.post({
       prefix: this.props.urlPrefix,
@@ -28,11 +34,14 @@ class OrderDetail extends Component {
   }
 
   fetchOrder() {
+    const self = this;
     this.setState({ loading: true })
-    api.orderDetail.get({
-      prefix: this.props.urlPrefix,
-      urlParams: { id: this.props.orderId }})
-      .then(json => this.setState({ loading: false, order: json }))
+    setTimeout(() => {
+      api.orderDetail.get({
+        prefix: this.props.urlPrefix,
+        urlParams: { id: this.props.orderId }})
+        .then(json => this.setState({ loading: false, order: json }))
+    }, 100)
   }
 
   componentDidMount() {
@@ -65,6 +74,22 @@ class OrderDetail extends Component {
       marginRight: '15px'
     };
     let status = <span className="icon icon-warning">UNKNOWN&nbsp;</span>;
+    let fulfillBtn = (
+      <button
+        onClick={() => this.handleFulfill()}
+        className="button yes"
+      >
+        Fulfill
+      </button>
+    );
+    let unfulfillBtn = (
+      <button
+        onClick={() => this.handleUnfulfill()}
+        className="button button-secondary"
+      >
+        Unfulfill
+      </button>
+    );
     let refundBtn = (
       <button
         onClick={() => this.handleRefund()}
@@ -81,7 +106,7 @@ class OrderDetail extends Component {
           <span className="icon icon-warning" style={spanStyle}>
             UNFULFILLED&nbsp;
                   </span>
-          <button onClick={() => this.handleFulfill()} className="button yes">Fulfill</button>
+          {fulfillBtn}
           {refundBtn}
         </div>
       );
@@ -92,6 +117,7 @@ class OrderDetail extends Component {
           <span className="icon icon-warning" style={spanStyleyes}>
             FULFILLED&nbsp;
                   </span>
+          {unfulfillBtn}
           {refundBtn}
         </div>
       );
@@ -119,6 +145,8 @@ class OrderDetail extends Component {
           items={order.items}
           subTotal={order.total}
           shippingRate={parseFloat(order.shipping_rate)}
+          discountTotal={order.discount_total}
+          discountValue={order.discount_value}
         />
       </div>
     );

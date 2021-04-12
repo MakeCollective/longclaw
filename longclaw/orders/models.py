@@ -2,6 +2,8 @@ from datetime import datetime
 from django.db import models
 from longclaw.settings import PRODUCT_VARIANT_MODEL
 from longclaw.shipping.models import Address
+# from longclaw.coupon.models import Discount
+from longclaw.coupon.utils import discount_total
 
 class Order(models.Model):
     SUBMITTED = 1
@@ -37,6 +39,8 @@ class Order(models.Model):
                                         decimal_places=2,
                                         blank=True,
                                         null=True)
+                                    
+    receipt_email_sent = models.BooleanField(default=False)
 
     def __str__(self):
         return "Order #{} - {}".format(self.id, self.email)
@@ -48,7 +52,20 @@ class Order(models.Model):
         total = 0
         for item in self.items.all():
             total += item.total
-        return total
+
+        return round(total, 2)
+    
+    @property
+    def final_payment(self):
+        """ The total payment received
+            This includes the total price (reduced by any discount applied), plus shipping
+        """
+        total = self.total
+        if self.shipping_rate:
+            total += self.shipping_rate
+        if self.discounts.first():
+            total, _ = discount_total(total, self.discounts.first())
+        return round(total, 2)
 
     @property
     def total_items(self):
@@ -73,6 +90,12 @@ class Order(models.Model):
         """Mark this order as being fulfilled
         """
         self.status = self.FULFILLED
+        self.save()
+
+    def unfulfill(self):
+        """Unmark this order as being fulfilled
+        """
+        self.status = self.SUBMITTED
         self.save()
 
     def cancel(self, refund=True):
