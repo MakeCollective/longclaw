@@ -12,14 +12,25 @@ class Account(models.Model):
     to perform a transaction through Stripe
     '''
     user = models.ForeignKey(User, related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
-    name = models.CharField(max_length=50)
-    email = models.EmailField(max_length=255)
     phone = models.CharField(max_length=20)
     company_name = models.CharField(max_length=100, blank=True, null=True)
     shipping_address = models.ForeignKey('shipping.Address', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
     billing_address = models.ForeignKey('shipping.Address', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
     stripe_customer_id = models.CharField(max_length=255, blank=True, null=True)
     active_payment_method = models.ForeignKey('account.AccountPaymentMethod', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
+
+    @property
+    def name(self):
+        full_name = []
+        if self.user.first_name:
+            full_name.append(self.user.first_name)
+        if self.user.last_name:
+            full_name.append(self.user.last_name)
+        return ' '.join(full_name)
+    
+    @property
+    def email(self):
+        return self.user.email
 
     # Related fields
     # AccountPaymentMethod(s)
