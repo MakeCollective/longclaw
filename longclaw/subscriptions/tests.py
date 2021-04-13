@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.conf import settings
 from django.apps import apps
+from django.contrib.auth import get_user_model
 
 from wagtail.core.models import Page
 
@@ -9,12 +10,18 @@ from longclaw.subscriptions.models import (
     Subscription, SubscriptionOrder, SubscriptionOrderItem,
 )
 
+UserModel = get_user_model()
 
 class SubscriptionTestCase(TestCase):
     def setUp(self):
+        user = UserModel.objects.create_user(
+            username='blake',
+            email='blake@make.nz',
+            password='testpassword123',
+            is_active=True,
+        )
         account = Account.objects.create(
-            name='Bloke Gilmoe',
-            email='bloke_gilmoe@make.nz',
+            user=user,
             phone='0212345678',
             stripe_customer_id='cus_abc123',
         )
@@ -28,9 +35,14 @@ class SubscriptionTestCase(TestCase):
 
 class SubscriptionOrderTestCase(TestCase):
     def setUp(self):
+        user = UserModel.objects.create_user(
+            username='blake',
+            email='blake@make.nz',
+            password='testpassword123',
+            is_active=True,
+        )
         account = Account.objects.create(
-            name='Bloke Gilmoe',
-            email='bloke_gilmore@make.nz',
+            user=user,
             phone='0212345678',
             stripe_customer_id='cus_abc123',
         )
@@ -63,9 +75,14 @@ class SubscriptionOrderTestCase(TestCase):
 
 class SubscriptionOrderItemTestCase(TestCase):
     def setUp(self):
+        user = UserModel.objects.create_user(
+            username='blake',
+            email='blake@make.nz',
+            password='testpassword123',
+            is_active=True,
+        )
         account = Account.objects.create(
-            name='Bloke Gilmoe',
-            email='bloke_gilmore@make.nz',
+            user=user,
             phone='0212345678',
             stripe_customer_id='cus_abc123',
         )

@@ -1,15 +1,16 @@
 from django.test import TestCase
 from django.conf import settings
 from django.apps import apps
+from django.contrib.auth import get_user_model
 
 from wagtail.core.models import Page
 
 from longclaw.shipping.models.locations import Address, Country
 from longclaw.account.models import (
     Account, AccountPaymentMethod,
-    
 )
 
+UserModel = get_user_model()
 
 class AccountTestCase(TestCase):
     def setUp(self):
@@ -25,9 +26,14 @@ class AccountTestCase(TestCase):
             postcode='8011', 
             country=country,
         )
+        user = UserModel.objects.create_user(
+            username='blake',
+            email='blake@make.nz',
+            password='testpassword123',
+            is_active=True,
+        )
         Account.objects.create(
-            name='Jeff Tester',
-            email='jeff_tester@make.nz',
+            user=user,
             phone='0212345678',
             company_name='Make Collective',
             shipping_address=address,
@@ -37,14 +43,19 @@ class AccountTestCase(TestCase):
         )
 
     def test_account_exists(self):
-        account = Account.objects.get(name='Jeff Tester')
+        account = Account.objects.get(user__username='blake')
     
 
 class AccountPaymentMethodTestCase(TestCase):
     def setUp(self):
+        user = UserModel.objects.create_user(
+            username='blake',
+            email='blake@make.nz',
+            password='testpassword123',
+            is_active=True,
+        )
         account = Account.objects.create(
-            name='Bloke Gilmoe',
-            email='bloke_gilmoe@make.nz',
+            user=user,
             phone='0212345678',
             stripe_customer_id='cus_JGFFKICO07bpLL',
         )
@@ -61,9 +72,14 @@ class AccountPaymentMethodTestCase(TestCase):
 class MissingStripeSecretTestCase(TestCase):
     ''' This test case kind of relies on that Stripe has been pip installed '''
     def setUp(self):
+        user = UserModel.objects.create_user(
+            username='blake',
+            email='blake@make.nz',
+            password='testpassword123',
+            is_active=True,
+        )
         account = Account.objects.create(
-            name='Bloke Gilmoe',
-            email='bloke_gilmoe@make.nz',
+            user=user,
             phone='0212345678',
             stripe_customer_id='cus_abc123',
         )
