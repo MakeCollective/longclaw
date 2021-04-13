@@ -2,3 +2,12 @@
     Main login page. User provides valid credentials and can login.
     Has links to signup page, recover password and such
 -->
+<h1>Login page</h1>
+<form action="." method="post">
+{% csrf_token %}
+{{form.as_p}}
+<input type="submit" value="Login">
+</form>
+<p><a href="{{password_reset_url}}">Password reset</a></p>
+
+{% include 'account/account_nav.html' %}
