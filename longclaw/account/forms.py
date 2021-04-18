@@ -1,8 +1,12 @@
 from django import forms
 from django.conf import settings
-from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
+from django.contrib.auth import get_user_model, password_validation
 from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm
 from django.utils.translation import gettext, gettext_lazy as _
+
+from longclaw.account.models import Account
+from longclaw.shipping.forms import AddressForm
 
 UserModel = get_user_model()
 
@@ -27,7 +31,7 @@ class AccountForm(forms.Form):
     company_name = forms.CharField(label='Company name', required=False)
 
 
-class CreateAccountForm(AccountForm):
+class SignupForm(AccountForm):
     '''
     Creates an Account instance given the details entered
     '''
@@ -43,6 +47,58 @@ class CreateAccountForm(AccountForm):
 
     field_order = ['name', 'company_name', 'email', 'phone', 'password', 'password_confirmation']
     
+    def clean(self):
+        cleaned_data = super().clean()
+
+        email = cleaned_data.get('email')
+        password = cleaned_data.get('password')
+        password_confirmation = cleaned_data.get('password_confirmation')
+
+        if not password:
+            msg = 'Password is required'
+            self.add_error('password', msg)
+
+        if not password_confirmation:
+            msg = 'Password must be provided and confirmed'
+            self.add_error('password_confirmation', msg)
+        
+        # check if passwords match
+        if password != password_confirmation:
+            msg = 'Passwords did not match'
+            self.add_error('password', msg)
+        
+        # check if user exists
+        if UserModel.objects.filter(email__iexact=email).count():
+            msg = 'Accout with that email already exists'
+            self.add_error('email', msg)
+        
+        try:
+            password_validation.validate_password(password)
+        except ValidationError as errors:
+            for error in errors:
+                self.add_error('password', error)
+        
+        return cleaned_data
+
+    def save(self, commit=True):
+        cleaned_data = self.cleaned_data
+
+        user = UserModel.objects.create_user(
+            username=cleaned_data.get('email'),
+            email=cleaned_data.get('email'),
+            password=cleaned_data.get('password'),
+            first_name=cleaned_data.get('name'),
+            # Deal with last name stuff at a later date
+            is_active=False, # Set to "True" when User's email is verified
+        )
+        # user.save()
+
+        account = Account.objects.create(
+            user=user,
+            name=cleaned_data.get('name'),
+        )
+        
+
 
 class LoginForm(AuthenticationForm):
 
