@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.conf import settings
 from django.apps import apps
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
 
 from wagtail.core.models import Page
 
@@ -23,7 +23,7 @@ class AccountTestCase(TestCase):
             name='Jeff Tester', 
             line_1='4a Valley Road', 
             city='Christchurch', 
-            postcode='8011', 
+            postcode='8011',
             country=country,
         )
         user = UserModel.objects.create_user(
@@ -44,6 +44,14 @@ class AccountTestCase(TestCase):
 
     def test_account_exists(self):
         account = Account.objects.get(user__username='blake')
+
+    def test_username_authentication(self):
+        authenticated_user = authenticate(username='blake', password='testpassword123')
+        assert isinstance(authenticated_user, UserModel)
+
+    def test_email_authentication(self):
+        authenticated_user = authenticate(username='blake@make.nz', password='testpassword123')
+        assert isinstance(authenticated_user, UserModel)
     
 
 class AccountPaymentMethodTestCase(TestCase):

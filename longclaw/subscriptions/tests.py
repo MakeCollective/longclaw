@@ -7,8 +7,9 @@ from wagtail.core.models import Page
 
 from longclaw.account.models import Account
 from longclaw.subscriptions.models import (
-    Subscription, SubscriptionOrder, SubscriptionOrderItem,
+    Subscription, SubscriptionOrderRelation, SubscriptionOrderItem,
 )
+from longclaw.orders.models import Order
 
 UserModel = get_user_model()
 
@@ -49,28 +50,15 @@ class SubscriptionOrderTestCase(TestCase):
         subscription = Subscription.objects.create(
             account=account,
         )
-        self.subscription_order = SubscriptionOrder.objects.create(
+        order = Order.objects.create()
+        self.subscription_order_relation = SubscriptionOrderRelation.objects.create(
             # Don't think anything is required
             subscription=subscription,
+            order=order,
         )
     
     def test_check_subscription_order_exists(self):
-        assert isinstance(self.subscription_order, SubscriptionOrder)
-    
-    def test_check_default_status(self):
-        assert self.subscription_order.status == SubscriptionOrder.SUBMITTED
-    
-    def test_fulfill(self):
-        self.subscription_order.fulfill()
-        assert self.subscription_order.status == SubscriptionOrder.FULFILLED
-    
-    def test_unfulfill(self):
-        self.subscription_order.unfulfill()
-        assert self.subscription_order.status == SubscriptionOrder.SUBMITTED
-    
-    def test_cancelled(self):
-        self.subscription_order.cancel()
-        assert self.subscription_order.status == SubscriptionOrder.CANCELLED
+        assert isinstance(self.subscription_order_relation, SubscriptionOrderRelation)
 
 
 class SubscriptionOrderItemTestCase(TestCase):
@@ -89,9 +77,11 @@ class SubscriptionOrderItemTestCase(TestCase):
         subscription = Subscription.objects.create(
             account=account,
         )
-        self.subscription_order = SubscriptionOrder.objects.create(
+        order = Order.objects.create()
+        self.subscription_order_relation = SubscriptionOrderRelation.objects.create(
             # Don't think anything is required
             subscription=subscription,
+            order=order,
         )
 
         product_variant_model = apps.get_model(
@@ -110,7 +100,7 @@ class SubscriptionOrderItemTestCase(TestCase):
             product=test_product,
         )
         self.subscription_order_item = SubscriptionOrderItem.objects.create(
-            order=self.subscription_order,
+            subscription=subscription,
             quantity=5,
             product=test_product_variant,
         )
