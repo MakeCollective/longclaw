@@ -11,7 +11,7 @@ class Account(models.Model):
     Hold details about a user. Details include at a minimum the amount of information
     to perform a transaction through Stripe
     '''
-    user = models.ForeignKey(User, related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
+    user = models.OneToOneField(User, related_name='+', on_delete=models.SET_NULL, blank=True, null=True) # one to one
     phone = models.CharField(max_length=20)
     company_name = models.CharField(max_length=100, blank=True, null=True)
     shipping_address = models.ForeignKey('shipping.Address', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
