@@ -83,21 +83,30 @@ class SignupForm(AccountForm):
     def save(self, commit=True):
         cleaned_data = self.cleaned_data
 
-        user = UserModel.objects.create_user(
-            username=cleaned_data.get('email'),
-            email=cleaned_data.get('email'),
-            password=cleaned_data.get('password'),
-            first_name=cleaned_data.get('name'),
-            # Deal with last name stuff at a later date
-            is_active=False, # Set to "True" when User's email is verified
-        )
-        # user.save()
+        if settings.ACCOUNT_REQUIRES_EMAIL_VERIFICATION:
+            user = UserModel.objects.create_user(
+                username=cleaned_data.get('email'),
+                email=cleaned_data.get('email'),
+                password=cleaned_data.get('password'),
+                first_name=cleaned_data.get('first_name'),
+                last_name=cleaned_data.get('last_name'),
+                is_active=False, # Set to "True" when User's email is verified
+            )
+        else:
+            user = UserModel.objects.create_user(
+                username=cleaned_data.get('email'),
+                email=cleaned_data.get('email'),
+                password=cleaned_data.get('password'),
+                first_name=cleaned_data.get('first_name'),
+                last_name=cleaned_data.get('last_name'),
+            )
 
         account = Account.objects.create(
             user=user,
-            name=cleaned_data.get('name'),
+            phone=cleaned_data.get('phone'),
+            company_name=cleaned_data.get('company_name'),
         )
-        
+        return account        
 
 
 class LoginForm(AuthenticationForm):
