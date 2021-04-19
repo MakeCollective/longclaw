@@ -4,4 +4,58 @@
 -->
 <h1>Account landing page</h1>
 
+<table style="text-align: left;">
+    <thead>
+        <tr>
+            <th style="border-bottom: 2px solid black; border-collapse: separate;">Field</th>
+            <th style="border-bottom: 2px solid black; border-collapse: separate;">Data</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Username</td>
+            <td>{{request.user.username}}</td>
+        </tr>
+        <tr>
+            <td>Email</td>
+            <td>{{request.user.email}}</td>
+        </tr>
+        <tr>
+            <td>Active</td>
+            <td>{{request.user.is_active}}</td>
+        </tr>
+        <tr>
+            <td>First name</td>
+            <td>{{request.user.first_name}}</td>
+        </tr>
+        <tr>
+            <td>Last name</td>
+            <td>{{request.user.last_name}}</td>
+        </tr>
+        <tr>
+            <td>Full name</td>
+            <td>{{request.user.account.name}}</td>
+        </tr>
+        <tr>
+            <td>Shipping address</td>
+            <td>{{request.user.account.shipping_address}}</td>
+        </tr>
+        <tr>
+            <td>Billing address</td>
+            <td>{{request.user.account.billing_address}}</td>
+        </tr>
+    </tbody>
+</table>
+
+{% comment %} 
+<h3>Subscriptions</h3>
+<div>
+    <ul>
+        {% for subscription in subscriptions %}
+        
+        {% endfor %}
+    </ul>
+</div> 
+{% endcomment %}
+
 {% include 'account/account_nav.html' %}
