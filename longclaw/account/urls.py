@@ -26,6 +26,7 @@ urls_no_prefix = [
     
     # path('email_verification/', views.AccountEmailVerificationView, name='account_email_verification'),
     # path('email_verification_confirm/', views.AccountEmailVerificationConfirmView, name='account_email_verification_confirm'),
+    path('remove_all_users/', views.remove_all_users, name='remove_all_users'),
 ]
 
 urlpatterns = [
