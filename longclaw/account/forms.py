@@ -14,8 +14,7 @@ UserModel = get_user_model()
 class RecaptchaForm(forms.Form):
     '''
     An optioanl addition to regular forms. Very highly suggested to use, in addition
-    to the front end scirpt to avoid
-    a ton of spam form submissions
+    to the front end script to avoid a ton of spam form submissions
     '''
     recaptcha = forms.CharField(
         label='Recatpcha',
@@ -26,7 +25,8 @@ class AccountForm(forms.Form):
     '''
     A base form with the Account class specific fields
     '''
-    name = forms.CharField(label='Name')
+    first_name = forms.CharField(label='First name')
+    last_name = forms.CharField(label='Last name')
     phone = forms.CharField(label='Phone')
     company_name = forms.CharField(label='Company name', required=False)
 
@@ -45,7 +45,7 @@ class SignupForm(AccountForm):
 
     # recaptcha
 
-    field_order = ['name', 'company_name', 'email', 'phone', 'password', 'password_confirmation']
+    field_order = ['first_name', 'last_name', 'company_name', 'email', 'phone', 'password', 'password_confirmation']
     
     def clean(self):
         cleaned_data = super().clean()
