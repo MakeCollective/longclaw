@@ -16,6 +16,7 @@ class Account(models.Model):
     company_name = models.CharField(max_length=100, blank=True, null=True)
     shipping_address = models.ForeignKey('shipping.Address', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
     billing_address = models.ForeignKey('shipping.Address', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
+    shipping_billing_address_same = models.BooleanField(default=True)
     stripe_customer_id = models.CharField(max_length=255, blank=True, null=True)
     active_payment_method = models.ForeignKey('account.AccountPaymentMethod', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
 

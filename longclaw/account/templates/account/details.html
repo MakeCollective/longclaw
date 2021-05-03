@@ -1,3 +1,23 @@
 <!--
     Page for viewing account specific details, e.g. addresses, subscription status or whatever
 -->
+<h1>Account details page</h1>
+
+{% include 'account/account_details_table.html' %}
+
+<ul>
+    <li><a href="{{account_details_edit_url}}">Edit details</a></li>
+</ul>
+
+{% comment %} 
+<h3>Subscriptions</h3>
+<div>
+    <ul>
+        {% for subscription in subscriptions %}
+        
+        {% endfor %}
+    </ul>
+</div> 
+{% endcomment %}
+
+{% include 'account/account_nav.html' %}

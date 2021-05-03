@@ -4,10 +4,11 @@ from django.http import JsonResponse
 from django.contrib.auth import get_user_model, login
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.edit import FormView, View
 
 from longclaw.account.forms import (
-    SignupForm, LoginForm
+    AccountForm, SignupForm, LoginForm
 )
 from longclaw.shipping.forms import AddressForm
 
@@ -101,6 +102,7 @@ class SignupView(View):
             if not shipping_billing_address_same:
                 billing_address = billing_address_form.save()
                 account.billing_address = billing_address
+                account.shipping_billing_address_same = False
             
             # Save the shipping/billing address(es) to the Account
             account.save()
@@ -118,7 +120,39 @@ class SignupView(View):
         }
         
         return render(request, self.template_name, context=context)
+
+
+class DetailsView(LoginRequiredMixin, View):
+    '''
+    View for a User to see their own general details
+    '''
+    login_url = reverse_lazy('login')
+    template_name = 'account/details.html'
+
+    def get(self, request):
+        context = {
+            'account_details_edit_url': reverse('account_details_edit'),
+        }
+
+        return render(request, self.template_name, context=context)
+
+
+class DetailsEditView(LoginRequiredMixin, View):
+    '''
+    View for a User to change and save their general Account details
+    '''
+    login_url = reverse_lazy('account_login')
+    template_name = 'account/details_edit.html'
+    success_url = reverse_lazy('account_details')
+
+    def get(self, request):
+        context = {}
         
+        return render(request, self.template_name, context=context)
+
+    def post(self, request):
+        pass
+
 
 
 class LoginView(auth_views.LoginView):

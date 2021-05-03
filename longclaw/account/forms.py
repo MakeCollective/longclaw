@@ -30,6 +30,9 @@ class AccountForm(forms.Form):
     phone = forms.CharField(label='Phone')
     company_name = forms.CharField(label='Company name', required=False)
 
+    def save(self, commit=True):
+        super().save()
+
 
 class SignupForm(AccountForm):
     '''

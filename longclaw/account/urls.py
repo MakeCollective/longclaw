@@ -8,7 +8,8 @@ PREFIX = 'account/'
 urls_no_prefix = [
     path('', views.LandingView, name='account_landing'),
     path('signup/', views.SignupView.as_view(), name='account_signup'),
-    # path('details/', views.DetailsView, name='account_details'), # TODO
+    path('details/', views.DetailsView.as_view(), name='account_details'),
+    path('details/edit/', views.DetailsEditView.as_view(), name='account_details_edit'),
     
     # path('delete/', views.AccountDeleteView, name='account_delete'), #TODO
     # path('delete/done/', views.AccountDeleteDoneView, name='account_delete_done'), #TODO
