@@ -6,10 +6,10 @@
     <li><a href="/account/login/">Login</a></li>
     <li><a href="/account/logout/">Logout</a></li>
     <li><a href="/account/password-reset/">Password reset</a></li>
-    <li><a href="/account/remove_all_users/" class="async-link">Delete test users</a></li>
+    {% comment %} <li><a href="/account/remove_all_users/" class="async-link">Delete test users</a></li> {% endcomment %}
 </ul>
 
-<script>
+{% comment %} <script>
 var async_links = document.querySelectorAll('.async-link');
 async_links.forEach(link => {
     link.addEventListener('click', function(e) {
@@ -19,4 +19,4 @@ async_links.forEach(link => {
             .then(data => console.log(data));
     });
 });
-</script>
+</script> {% endcomment %}
