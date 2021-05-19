@@ -29,6 +29,27 @@ select {
     appearance: none;
 }
 
+.form-row {
+
+}
+
+.form-row:not(:last-of-type) {
+    margin-bottom: 10px;
+}
+
+.action-buttons {
+    display: flex;
+    margin: 15px 0;
+}
+
+.action-buttons >* {
+    display: inline-block;
+}
+
+.action-buttons >*:not(:last-child) {
+    margin-right: 15px;
+}
+
 .button {
     display: inline-block;
     padding: 10px;
@@ -42,28 +63,6 @@ select {
     line-height: 1em;
     cursor: pointer;
 }
-
-.form-row {
-
-}
-
-.form-row:not(:last-of-type) {
-    margin-bottom: 10px;
-}
-
-.form-row__inline {
-    display: flex;
-}
-
-.form-row__inline >* {
-    display: inline-block;
-    margin: 0;
-}
-
-.form-row__inline >*:not(:last-child) {
-    margin-right: 10px;
-}
-
 
 /* Table details */
 table {
@@ -88,6 +87,15 @@ table td {
 
 
 
-table td:not(:last-child) {
-
+/* Account Nav */
+ul.account-nav {
+    list-style: none;
+    padding: 0;
+    margin: 15px 0;
+    display: flex;
 }
+
+ul.account-nav li a {
+    padding: 8px;
+}
+
