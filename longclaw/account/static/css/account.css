@@ -1,0 +1,93 @@
+* {
+    box-sizing: border-box;
+}
+
+form {
+    max-width: 400px;
+    width: 100%;
+}
+
+label, input {
+    display: inline-block;
+    width: 100%;
+}
+
+label {
+    line-height: 2em;
+}
+
+input {
+    padding: 8px;
+}
+
+input[type='checkbox'], input[type='submit'] {
+    width: auto;
+}
+
+select {
+    padding: 8px;
+    appearance: none;
+}
+
+.button {
+    display: inline-block;
+    padding: 10px;
+    border: 1px solid black;
+    border-radius: 3px;
+    color: black;
+    background-color: #eeeeee;
+    text-decoration: none;
+    font-family: inherit;
+    font-size: 1em;
+    line-height: 1em;
+    cursor: pointer;
+}
+
+.form-row {
+
+}
+
+.form-row:not(:last-of-type) {
+    margin-bottom: 10px;
+}
+
+.form-row__inline {
+    display: flex;
+}
+
+.form-row__inline >* {
+    display: inline-block;
+    margin: 0;
+}
+
+.form-row__inline >*:not(:last-child) {
+    margin-right: 10px;
+}
+
+
+/* Table details */
+table {
+    text-align: left;
+    border-collapse: collapse;
+}
+
+table th, table td {
+    padding: 8px;
+}
+
+table th {
+    border-collapse: separate;
+    border: 2px solid black;
+    background-color: gainsboro;
+}
+
+table td {
+    border: 2px solid darkgrey;
+    background: whitesmoke;
+}
+
+
+
+table td:not(:last-child) {
+
+}
