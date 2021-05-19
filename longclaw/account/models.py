@@ -11,15 +11,35 @@ class Account(models.Model):
     Hold details about a user. Details include at a minimum the amount of information
     to perform a transaction through Stripe
     '''
-    user = models.ForeignKey(User, related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
-    name = models.CharField(max_length=50)
-    email = models.EmailField(max_length=255)
+    user = models.OneToOneField(User, related_name='account', on_delete=models.SET_NULL, blank=True, null=True)
     phone = models.CharField(max_length=20)
     company_name = models.CharField(max_length=100, blank=True, null=True)
     shipping_address = models.ForeignKey('shipping.Address', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
     billing_address = models.ForeignKey('shipping.Address', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
+    shipping_billing_address_same = models.BooleanField(default=True)
     stripe_customer_id = models.CharField(max_length=255, blank=True, null=True)
     active_payment_method = models.ForeignKey('account.AccountPaymentMethod', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
+
+    def __str__(self):
+        string = f'({self.id}) '
+        if not self.user:
+            string += f'No User attached'
+        else:
+            string += f'{self.user.email}'
+        return string
+
+    @property
+    def name(self):
+        full_name = []
+        if self.user.first_name:
+            full_name.append(self.user.first_name)
+        if self.user.last_name:
+            full_name.append(self.user.last_name)
+        return ' '.join(full_name)
+    
+    @property
+    def email(self):
+        return self.user.email
 
     # Related fields
     # AccountPaymentMethod(s)

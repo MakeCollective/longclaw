@@ -1,0 +1,22 @@
+<ul class="account-nav">
+    <li><a href="/">Home</a></li>
+    <li><a href="/account/">Account</a></li>
+    <li><a href="/account/details/">Details</a></li>
+    <li><a href="/account/signup/">Signup</a></li>
+    <li><a href="/account/login/">Login</a></li>
+    <li><a href="/account/logout/">Logout</a></li>
+    <li><a href="/account/password-reset/">Password reset</a></li>
+    {% comment %} <li><a href="/account/remove_all_users/" class="async-link">Delete test users</a></li> {% endcomment %}
+</ul>
+
+{% comment %} <script>
+var async_links = document.querySelectorAll('.async-link');
+async_links.forEach(link => {
+    link.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.fetch(e.target.getAttribute('href'))
+            .then(response => response.json())
+            .then(data => console.log(data));
+    });
+});
+</script> {% endcomment %}
