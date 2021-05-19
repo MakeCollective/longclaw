@@ -19,6 +19,11 @@ class RecaptchaForm(forms.Form):
     recaptcha = forms.CharField(
         label='Recatpcha',
         widget=forms.HiddenInput(attrs={'data-recaptchapublickey': settings.RECAPTCHA_PUBLIC_KEY}))
+    
+    def clean(self, *args, **kwargs):
+        # if not verify_recaptcha(self.cleaned_data.get('recaptcha')):
+        #     self.add_error('__all__', 'reCAPTCHA token is invalid, please reload the page and try again')
+        return super().clean(*args, **kwargs)
 
 
 class AccountForm(forms.Form):
@@ -30,8 +35,19 @@ class AccountForm(forms.Form):
     phone = forms.CharField(label='Phone')
     company_name = forms.CharField(label='Company name', required=False)
 
-    def save(self, commit=True):
-        super().save()
+    def update(self, instance):
+        # Update and save User model
+        instance.user.first_name = self.cleaned_data['first_name']
+        instance.user.last_name = self.cleaned_data['last_name']
+        instance.user.save(update_fields=['first_name', 'last_name'])
+        
+        # Update and save Account model
+        instance.phone = self.cleaned_data['phone']
+        instance.company_name = self.cleaned_data['company_name']
+        instance.save(update_fields=['phone', 'company_name'])
+        
+        return instance
+
 
 
 class SignupForm(AccountForm):
@@ -114,11 +130,6 @@ class SignupForm(AccountForm):
 
 class LoginForm(AuthenticationForm):
 
-    # recaptcha = forms.CharField(
-    #     label='Recaptcha',
-    #     widget=forms.HiddenInput(attrs={'data-recaptchapublickey': settings.RECAPTCHA_PUBLIC_KEY, 'class': 'recaptcha-input'})
-    # )
-
     error_messages = {
         'invalid_login': _(
             "Please enter a correct username/email and password. Note that both "
@@ -132,9 +143,6 @@ class LoginForm(AuthenticationForm):
         self.fields['username'].label = 'Username or email address'
 
     def clean(self, *args, **kwargs):
-
-        # if not verify_recaptcha(self.cleaned_data.get('recaptcha')):
-        #     self.add_error('__all__', 'reCAPTCHA token is invalid, please reload the page and try again')
         
         return super().clean(*args, **kwargs)
 
