@@ -6,7 +6,7 @@ from longclaw.account import views
 PREFIX = 'account/'
 
 urls_no_prefix = [
-    path('', views.LandingView, name='account_landing'),
+    path('', views.LandingView.as_view(), name='account_landing'),
     path('signup/', views.SignupView.as_view(), name='account_signup'),
     path('details/', views.DetailsView.as_view(), name='account_details'),
     path('details/edit/', views.DetailsEditView.as_view(), name='account_details_edit'),

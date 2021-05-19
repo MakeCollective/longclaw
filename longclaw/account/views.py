@@ -31,24 +31,19 @@ def remove_all_users(request):
 # PasswordResetCompleteView
 
 
-@login_required(login_url='/account/login/')
-def LandingView(request):
-    return render(request, 'account/landing.html', context={})
+class LandingView(LoginRequiredMixin, View):
+    login_url = reverse_lazy('login')
+    template_name = 'account/landing.html'
+
+    def get(self, request):
+        context = {}
+        return render(request, self.template_name, context=context)
 
 
 
 class SignupView(View):
     template_name = 'account/signup.html'
-    # success_url = '/account'
     success_url = reverse_lazy('account_landing')
-
-    # def get_context(self, request):
-    #     context = {
-    #         'user_form': SignupForm(prefix='user_form'),
-    #         'shipping_address_form': AddressForm(prefix='shipping_address'),
-    #         'billing_address_form': AddressForm(prefix='billing_address', use_required_attribute=False),
-    #     }
-    #     return context
 
     def get(self, request):
         context = {
