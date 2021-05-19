@@ -13,7 +13,7 @@ UserModel = get_user_model()
 
 class RecaptchaForm(forms.Form):
     '''
-    An optioanl addition to regular forms. Very highly suggested to use, in addition
+    An optional addition to regular forms. Very highly suggested to use, in addition
     to the front end script to avoid a ton of spam form submissions
     '''
     recaptcha = forms.CharField(
