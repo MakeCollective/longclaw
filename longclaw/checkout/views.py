@@ -15,6 +15,7 @@ from longclaw.basket.utils import get_basket_items, basket_id
 from longclaw.orders.models import Order
 from longclaw.coupon.models import Discount
 from longclaw.coupon.utils import discount_total
+from longclaw.shipping.models.rates import ShippingRate
 
 
 @require_GET
