@@ -35,12 +35,21 @@ def destroy_basket(request):
     return bid
 
 
-def add_to_basket(basket_id, variant, quantity=1):
+def basket_total(bid):
+    basket_items = BasketItem.objects.filter(basket_id=bid)
+    total = 0
+    for item in basket_items:
+        total += item.total()
+    return total
+
+
+
+def add_to_basket(bid, variant, quantity=1):
     try:
-        basket_item = BasketItem.objects.get(basket_id=basket_id, variant=variant)
+        basket_item = BasketItem.objects.get(basket_id=bid, variant=variant)
         basket_item.increase_quantity(quantity)
     except BasketItem.DoesNotExist:
-        basket_item = BasketItem.objects.create(basket_id=basket_id, variant=variant, quantity=quantity)
+        basket_item = BasketItem.objects.create(basket_id=bid, variant=variant, quantity=quantity)
 
-    return BasketItem.objects.filter(basket_id=basket_id)
+    return BasketItem.objects.filter(basket_id=bid)
 
