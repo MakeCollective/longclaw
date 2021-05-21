@@ -40,6 +40,48 @@
             </tr>
         </tbody>
     </table>
+
+    <p>
+        <label for="default_addresses">
+            <input type="checkbox"{% if default_addresses %} checked{% endif %} name="default_addresses" id="default_addresses">
+            Use default shipping and billing addresses
+        </label>
+    </p>
+
+    <div class="default-addresses" {% if not default_addresses %}hidden{% endif %}>
+        <p>Shipping: {{shipping_address}}</p>
+        <p>Billing: {{billing_address}}</p>
+    </p>
+
+
+    <div id="shipping-address-fields"{% if default_addresses %} hidden{% endif %}>
+        <h3>Shipping address</h3>
+        {% for field in shipping_address_form %}
+            <div class="form-row">
+                {{field.errors}}
+                {{field.label_tag}} {{field}}
+            </div>
+        {% endfor %}
+    </div>
+
+    <p {% if default_addresses %}hidden{% endif %}>
+        <label for="shipping_billing_address_same">
+            <input type="checkbox"{% if shipping_billing_address_same %} checked{% endif %} name="shipping_billing_address_same" id="shipping_billing_address_same">
+            Same billing address
+        </label>
+    </p>
+
+    <div id="billing-address-fields"{% if shipping_billing_address_same or default_addresses %} hidden{% endif %}>
+        <h3>Billing address</h3>
+        {{billing_address_form.errors}}
+        {% for field in billing_address_form %}
+            <div class="form-row">
+                {{field.errors}}
+                {{field.label_tag}} {{field}}
+            </div>
+        {% endfor %}
+    </div>
+    
     <div class="action-buttons">
         <button type="submit" class="button" href="">Create subscription</a>
     </div>

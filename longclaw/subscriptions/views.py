@@ -8,7 +8,9 @@ from longclaw.basket.utils import basket_id, get_basket_items, add_to_basket, ba
 from longclaw.basket.models import BasketItem
 from longclaw.configuration.models import Configuration
 from longclaw.subscriptions.models import Subscription
+from longclaw.subscriptions.utils import create_subscription_order
 from longclaw.orders.models import Order
+from longclaw.shipping.forms import AddressForm
 
 from django.conf import settings
 ProductVariant = apps.get_model(*settings.PRODUCT_VARIANT_MODEL.split('.'))
@@ -48,9 +50,24 @@ class SubscriptionCreateView(LoginRequiredMixin, TemplateView):
         
         basket, bid = get_basket_items(request)
 
+        # Get current address(es) from account details
+        account = request.user.account
+        shipping_address = account.shipping_address
+        billing_address = account.billing_address
+        
+        # Get address form(s)
+        shipping_address_form = AddressForm(prefix='shipping_address', instance=shipping_address)
+        billing_address_form = AddressForm(prefix='billing_address', instance=billing_address)
+
+
         context.update({
             'basket': basket,
             'basket_total': basket_total(bid),
+            'shipping_address_form': shipping_address_form,
+            'billing_address_form': billing_address_form,
+            'shipping_address': shipping_address,
+            'billing_address': billing_address,
+            'default_addresses': True,
         })
 
         return render(request, self.template_name, context=context)
@@ -68,6 +85,15 @@ class SubscriptionCreateView(LoginRequiredMixin, TemplateView):
             basket_item.save()
 
         basket, bid = get_basket_items(request)
+
+
+
+
+
+        # Create the order based on the current basket
+        # Order.objects.create()
+        # create_subscription_order
+        
 
         context.update({
             'basket': basket,
