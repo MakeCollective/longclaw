@@ -35,12 +35,21 @@ class SubscriptionIndexView(LoginRequiredMixin, View):
 class SubscriptionCreateView(LoginRequiredMixin, TemplateView):
     login_view = reverse_lazy('login')
     template_name = 'subscriptions/subscription_create.html'
+    success_url = reverse_lazy('subscription_create_success')
 
     def get_context(self, request):
         product_variants = ProductVariant.objects.all()
+        
+        # Get current address(es) from account details
+        account = request.user.account
+        shipping_address = account.shipping_address
+        billing_address = account.billing_address
+
         context = {
             'product_variants': product_variants,
             'currency_html_code': CURRENCY_HTML_CODE,
+            'shipping_address': shipping_address,
+            'billing_address': billing_address,
         }
 
         return context
@@ -49,31 +58,25 @@ class SubscriptionCreateView(LoginRequiredMixin, TemplateView):
         context = self.get_context(request)
         
         basket, bid = get_basket_items(request)
-
-        # Get current address(es) from account details
-        account = request.user.account
-        shipping_address = account.shipping_address
-        billing_address = account.billing_address
         
         # Get address form(s)
-        shipping_address_form = AddressForm(prefix='shipping_address', instance=shipping_address)
-        billing_address_form = AddressForm(prefix='billing_address', instance=billing_address)
-
+        shipping_address_form = AddressForm(prefix='shipping_address', instance=context.get('shipping_address'), use_required_attribute=False)
+        billing_address_form = AddressForm(prefix='billing_address', instance=context.get('billing_address'), use_required_attribute=False)
 
         context.update({
             'basket': basket,
             'basket_total': basket_total(bid),
             'shipping_address_form': shipping_address_form,
             'billing_address_form': billing_address_form,
-            'shipping_address': shipping_address,
-            'billing_address': billing_address,
             'default_addresses': True,
+            'shipping_billing_address_same': True,
         })
 
         return render(request, self.template_name, context=context)
 
     def post(self, request):
         context = self.get_context(request)
+        account = request.user.account
 
         # Get the basket item IDs and their quantities
         items = [{'id': k.split('item_')[1], 'quantity': v} for k, v in request.POST.items() if k.startswith('item_')]
@@ -86,8 +89,55 @@ class SubscriptionCreateView(LoginRequiredMixin, TemplateView):
 
         basket, bid = get_basket_items(request)
 
+        shipping_address_form = AddressForm(prefix='shipping_address', instance=context.get('shipping_address'), use_required_attribute=False)
+        billing_address_form = AddressForm(prefix='billing_address', instance=context.get('billing_address'), use_required_attribute=False)
+
+        # Get address form(s)
+        default_addresses = request.POST.get('default_addresses')
+        shipping_billing_address_same = request.POST.get('shipping_billing_address_same')
+        if default_addresses:
+            shipping_address = account.shipping_address
+            billing_address = account.billing_address
+
+            # Create order here
+            create_subscription_order(
+                request, account,
+                shipping_address=shipping_address, 
+                billing_address=billing_address,
+            )
+            return redirect(self.success_url)
+        else:
+            shipping_address_form = AddressForm(request.POST, prefix='shipping_address', instance=context.get('shipping_address'), use_required_attribute=False)
+
+            if not shipping_billing_address_same:
+                billing_address_form = AddressForm(request.POST, prefix='billing_address', instance=context.get('billing_address'), use_required_attribute=False)
+            else:
+                billing_address_form = AddressForm(prefix='billing_address', use_required_attribute=False)
 
 
+            errors = False
+            
+            if not shipping_address_form.is_valid():
+                print('shipping_address_form is invalid')
+                errors = True
+            
+            if not billing_address_form.is_valid():
+                print('billing_address_form is invalid')
+                errors = True
+
+            if not errors:
+                print('*'*80)
+                print('no errors, do the thing')
+                print('*'*80)
+                if shipping_address_form.changed():
+                    shipping_address = shipping_address_form.save()
+                
+                if not shipping_billing_address_same:
+                    billing_address = billing_address_form.save()
+          
+        
+                # Create order here
+                return redirect(self.success_url)
 
 
         # Create the order based on the current basket
@@ -98,8 +148,19 @@ class SubscriptionCreateView(LoginRequiredMixin, TemplateView):
         context.update({
             'basket': basket,
             'basket_total': basket_total(bid),
+            'shipping_address_form': shipping_address_form,
+            'billing_address_form': billing_address_form,
+            'default_addresses': request.POST.get('default_addresses'),
+            'shipping_billing_address_same': request.POST.get('shipping_billing_address_same'),
         })
 
         return render(request, self.template_name, context=context)
 
 
+
+class SubscriptionCreateSuccessView(LoginRequiredMixin, TemplateView):
+    login_url = reverse_lazy('login')
+    template_name = 'subscriptions/subscription_create_success.html'
+
+    
+    

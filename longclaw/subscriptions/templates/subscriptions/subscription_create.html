@@ -48,38 +48,40 @@
         </label>
     </p>
 
-    <div class="default-addresses" {% if not default_addresses %}hidden{% endif %}>
+    <div id="default-address-values" {% if not default_addresses %}hidden{% endif %}>
         <p>Shipping: {{shipping_address}}</p>
-        <p>Billing: {{billing_address}}</p>
-    </p>
-
-
-    <div id="shipping-address-fields"{% if default_addresses %} hidden{% endif %}>
-        <h3>Shipping address</h3>
-        {% for field in shipping_address_form %}
-            <div class="form-row">
-                {{field.errors}}
-                {{field.label_tag}} {{field}}
-            </div>
-        {% endfor %}
+        <p>Billing: {% if billing_address %}{{billing_address}}{% else %}{{shipping_address}}{% endif %}</p>
     </div>
 
-    <p {% if default_addresses %}hidden{% endif %}>
-        <label for="shipping_billing_address_same">
-            <input type="checkbox"{% if shipping_billing_address_same %} checked{% endif %} name="shipping_billing_address_same" id="shipping_billing_address_same">
-            Same billing address
-        </label>
-    </p>
 
-    <div id="billing-address-fields"{% if shipping_billing_address_same or default_addresses %} hidden{% endif %}>
-        <h3>Billing address</h3>
-        {{billing_address_form.errors}}
-        {% for field in billing_address_form %}
-            <div class="form-row">
-                {{field.errors}}
-                {{field.label_tag}} {{field}}
-            </div>
-        {% endfor %}
+    <div id="custom-addresses"{% if default_addresses %} hidden{% endif %}>
+        <div id="shipping-address-fields">
+            <h3>Shipping address</h3>
+            {% for field in shipping_address_form %}
+                <div class="form-row">
+                    {{field.errors}}
+                    {{field.label_tag}} {{field}}
+                </div>
+            {% endfor %}
+        </div>
+
+        <p>
+            <label for="shipping_billing_address_same">
+                <input type="checkbox" checked name="shipping_billing_address_same" id="shipping_billing_address_same">
+                Same billing address
+            </label>
+        </p>
+
+        <div id="billing-address-fields"{% if shipping_billing_address_same %} hidden{% endif %}>
+            <h3>Billing address</h3>
+            {{billing_address_form.errors}}
+            {% for field in billing_address_form %}
+                <div class="form-row">
+                    {{field.errors}}
+                    {{field.label_tag}} {{field}}
+                </div>
+            {% endfor %}
+        </div>
     </div>
     
     <div class="action-buttons">
@@ -129,8 +131,47 @@ function updateBasketItemTotal(basketItem, quantity) {
     totalEl.innerHTML = itemTotal.toFixed(2)
 }
 
+/* Custom address checkbox */
+function armDefaultAddressCheckbox() {
+    const defaultAddress = document.getElementById('default_addresses');
+    const customAddresses = document.getElementById('custom-addresses');
+    const defaultAddressValues = document.getElementById('default-address-values');
+    defaultAddress.addEventListener('change', function(e) {
+        if (this.checked) {
+            hideElement(customAddresses);
+            showElement(defaultAddressValues);
+        } else {
+            showElement(customAddresses);
+            hideElement(defaultAddressValues);
+        }
+    });
+}
+
+/* Arm the checkbox to enable/disable separate billing address fields */
+function armShippingAddressCheckbox() {
+    const shippingBillingAddressSame = document.getElementById('shipping_billing_address_same');
+    const billingAddressFields = document.getElementById('billing-address-fields');
+    shippingBillingAddressSame.addEventListener('change', function(e) {
+        if (this.checked) {
+            hideElement(billingAddressFields);
+        } else {
+            showElement(billingAddressFields);
+        }
+    });
+}
+
+function showElement(el) {
+    el.removeAttribute('hidden');
+}
+
+function hideElement(el) {
+    el.setAttribute('hidden', '');
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     armBasketItems();
+    armDefaultAddressCheckbox();
+    armShippingAddressCheckbox();
 }, false);
 </script>
 {% endblock extra_js %}
