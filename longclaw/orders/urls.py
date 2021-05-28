@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import path
 from longclaw.orders import api
 
 from longclaw.settings import API_URL_PREFIX
@@ -23,35 +23,11 @@ order_statuses = api.OrderViewSet.as_view({
     'get': 'order_statuses'
 })
 
-PREFIX = r'^{}order/'.format(API_URL_PREFIX)
+PREFIX = API_URL_PREFIX + 'order/'
 urlpatterns = [
-    url(
-        PREFIX + 'statuses/',
-        order_statuses,
-        name='longclaw_order_statuses'
-    ),
-
-    url(
-        PREFIX + r'(?P<pk>[0-9]+)/$',
-        orders,
-        name='longclaw_orders'
-    ),
-
-    url(
-        PREFIX + r'(?P<pk>[0-9]+)/fulfill/$',
-        fulfill_order,
-        name='longclaw_fulfill_order'
-    ),
-
-    url(
-        PREFIX + r'(?P<pk>[0-9]+)/unfulfill/$',
-        unfulfill_order,
-        name='longclaw_unfulfill_order'
-    ),
-
-    url(
-        PREFIX + r'(?P<pk>[0-9]+)/refund/$',
-        refund_order,
-        name='longclaw_refund_order'
-    )
+    path(PREFIX + 'statuses/', order_statuses, name='longclaw_order_statuses'),
+    path(PREFIX + '<int:pk>/', orders, name='longclaw_orders'),
+    path(PREFIX + '<int:pk>/fulfill/', fulfill_order, name='longclaw_fulfill_order'),
+    path(PREFIX + '<int:pk>/unfulfill/', unfulfill_order, name='longclaw_unfulfill_order'),
+    path(PREFIX + '<int:pk>/refund/', refund_order, name='longclaw_refund_order')
 ]
