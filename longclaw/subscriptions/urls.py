@@ -9,7 +9,7 @@ urls_no_prefix = [
     path('', views.SubscriptionIndexView.as_view(), name='subscriptions_index'),
     path('create/', views.SubscriptionCreateView.as_view(), name='subscription_create'),
     path('create/success/', views.SubscriptionCreateSuccessView.as_view(), name='subscription_create_success'),
-    path('test-add-to-basket/', views.what, name='what'),
+    path('test-add-to-basket/', views.test_add_to_basket, name='test_add_to_basket'),
     # path('create/confirm/', views.SubscriptionCreateConfirmView.as_view(), name='subscription_create_confirm'),
 ]
 
