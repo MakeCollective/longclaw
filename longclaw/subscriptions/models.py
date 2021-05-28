@@ -1,7 +1,10 @@
 from django.db import models
 from django.conf import settings
 
+from wagtail.snippets.models import register_snippet
 
+
+@register_snippet
 class Subscription(models.Model):
     ''' 
     Holds information relating to a single subscription

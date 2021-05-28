@@ -59,7 +59,6 @@ def create_subscription_order(
         shipping_address=shipping_address,
         billing_address=billing_address,
         shipping_rate=shipping_rate,
-        discount=discount,
     )
     order.save()
 
@@ -68,6 +67,7 @@ def create_subscription_order(
         shipping_address=shipping_address,
         billing_address=billing_address,
     )
+    subscription.save()
 
     # Create the order items & compute total
     total = 0
