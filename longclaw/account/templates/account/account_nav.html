@@ -9,9 +9,10 @@
     <li><a href="/account/subscriptions/">Subscriptions</a></li>
     <li><a href="/account/subscriptions/create/">Subscriptions create</a></li>
     {% comment %} <li><a href="/account/remove_all_users/" class="async-link">Delete test users</a></li> {% endcomment %}
+    <li><a href="/account/subscriptions/test-add-to-basket/" class="async-link">Test basket</a></li>
 </ul>
 
-{% comment %} <script>
+<script>
 var async_links = document.querySelectorAll('.async-link');
 async_links.forEach(link => {
     link.addEventListener('click', function(e) {
@@ -21,4 +22,4 @@ async_links.forEach(link => {
             .then(data => console.log(data));
     });
 });
-</script> {% endcomment %}
+</script>
