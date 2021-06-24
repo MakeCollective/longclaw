@@ -14,7 +14,6 @@ from longclaw.shipping.forms import AddressForm
 
 from django.conf import settings
 ProductVariant = apps.get_model(*settings.PRODUCT_VARIANT_MODEL.split('.'))
-CURRENCY_HTML_CODE = Configuration.objects.first().currency_html_code
 
 from django.http import JsonResponse
 
@@ -64,7 +63,7 @@ class SubscriptionCreateView(LoginRequiredMixin, TemplateView):
 
         context = {
             'product_variants': product_variants,
-            'currency_html_code': CURRENCY_HTML_CODE,
+            'currency_html_code': Configuration.objects.first().currency_html_code,
             'shipping_address': shipping_address,
             'billing_address': billing_address,
         }
