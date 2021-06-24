@@ -88,7 +88,6 @@ def create_order(email,
         shipping_address=shipping_address,
         billing_address=billing_address,
         shipping_rate=shipping_rate,
-        discount=discount,
     )
     order.save()
 

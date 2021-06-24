@@ -1,0 +1,81 @@
+<!--
+    Contains all fields relevant to signing up for an Account
+    email, password, address, ...etc
+-->
+{% extends "account/account_base.html" %}
+
+{% block content %}
+<h1>Signup page</h1>
+
+<form action="." method='post'>
+    {% csrf_token %}
+    <div class="user-form-fields">
+        {{user_form.errors}}
+        {% for field in user_form %}
+            <div class="form-row">
+                {{field.errors}}
+                {{field.label_tag}} {{field}}
+            </div>
+        {% endfor %}
+    </div>
+
+    <div id="shipping-address-fields">
+        <h3>Shipping address</h3>
+        {{shipping_address_form.errors}}
+        {% for field in shipping_address_form %}
+            <div class="form-row">
+                {{field.errors}}
+                {{field.label_tag}} {{field}}
+            </div>
+        {% endfor %}
+    </div>
+
+    <p>
+        <label for="shipping_billing_address_same">
+            <input type="checkbox"{% if shipping_billing_address_same %} checked{% endif %} name="shipping_billing_address_same" id="shipping_billing_address_same">
+            Same billing address
+        </label>
+        
+    </p>
+
+    <div id="billing-address-fields"{% if shipping_billing_address_same %} hidden{% endif %}>
+        <h3>Billing address</h3>
+        {{billing_address_form.errors}}
+        {% for field in billing_address_form %}
+            <div class="form-row">
+                {{field.errors}}
+                {{field.label_tag}} {{field}}
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="action-buttons">
+        <input class="button" type="submit" value="Submit">
+        <a class="button" href="/">Cancel</a>
+    </div>
+</form>
+
+{% include 'account/account_nav.html' %}
+{% endblock content %}
+
+{% block extra_js %}
+<script>
+var shipping_billing_address_checkbox = document.getElementById('shipping_billing_address_same');
+var billing_address_fields_container = document.getElementById('billing-address-fields');
+
+// Hide/show billing address fields if checkbox checked
+shipping_billing_address_checkbox.addEventListener('change', function(e) {
+    if (this.checked) {
+        billing_address_fields_container.setAttribute('hidden', '');
+    } else {
+        billing_address_fields_container.removeAttribute('hidden');
+    }
+});
+</script>
+
+{% if form.recaptcha %}
+<script>
+console.log('do recaptcha stuff');
+</script>
+{% endif %}
+{% endblock extra_js %}

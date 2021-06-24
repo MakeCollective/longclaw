@@ -1,0 +1,26 @@
+{% extends "account/account_base.html" %}
+
+{% block content %}
+
+<h1>Subscriptions index</h1>
+
+<ul>
+    {% for subscription in subscriptions %}
+        <li>
+            <ul>
+                <li>{{subscription.account.name}}</li>
+                <li>
+                    <ul>
+                        {% for item in subscription.items.all %}
+                            <li>{{item}}</li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            </ul>
+        </li>
+    {% endfor %}
+</ul>
+
+{% include "account/account_nav.html" %}
+
+{% endblock content %}

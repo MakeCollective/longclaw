@@ -25,6 +25,10 @@ class Address(models.Model):
     def __str__(self):
         return "{}, {}, {}".format(self.name, self.city, self.country)
 
+    class Meta:
+        verbose_name = 'Address'
+        verbose_name_plural = 'Addresses'
+
 
 class Country(models.Model):
     """

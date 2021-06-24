@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     'longclaw.basket',
     'longclaw.stats',
     'longclaw.coupon',
+    'longclaw.account',
+    'longclaw.subscriptions',
 
     'home',
     'search',
@@ -150,3 +152,7 @@ BASE_URL = 'http://example.com'
 PAYMENT_GATEWAY = 'longclaw.checkout.gateways.BasePayment'
 
 PRODUCT_VARIANT_MODEL = 'catalog.ProductVariant'
+
+AUTHENTICATION_BACKENDS = ['longclaw.account.authentication_backend.EmailBackend']
+
+ACCOUNT_REQUIRES_EMAIL_VERIFICATION = True
