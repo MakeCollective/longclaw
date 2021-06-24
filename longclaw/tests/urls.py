@@ -16,6 +16,4 @@ urlpatterns = [
     url(r'', include(longclaw_urls)),
     url(r'', include(request_urls)),
     url(r'', include(wagtail_urls)),
-
-
 ]
