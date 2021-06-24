@@ -6,7 +6,18 @@
 
 <ul>
     {% for subscription in subscriptions %}
-        <li>{{subscription}}</li>
+        <li>
+            <ul>
+                <li>{{subscription.account.name}}</li>
+                <li>
+                    <ul>
+                        {% for item in subscription.items.all %}
+                            <li>{{item}}</li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            </ul>
+        </li>
     {% endfor %}
 </ul>
 
