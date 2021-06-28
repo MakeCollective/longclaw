@@ -16,7 +16,7 @@ from longclaw.orders.models import Order
 from longclaw.coupon.models import Discount
 from longclaw.coupon.utils import discount_total
 from longclaw.shipping.models.rates import ShippingRate
-
+from longclaw.configuration.models import Configuration
 
 @require_GET
 def checkout_success(request, pk):
@@ -49,7 +49,11 @@ class CheckoutView(TemplateView):
             site=site)
         context['basket'] = items
         
-        default_shipping_rate = ShippingRate.objects.first().rate
+        shipping_rate = ShippingRate.objects.first()
+        if shipping_rate:
+            default_shipping_rate = shipping_rate.rate
+        else:
+            default_shipping_rate = Configuration.objects.first().default_shipping_rate
         total_price = sum(item.total() for item in items)
         discount = Discount.objects.filter(basket_id=basket_id(self.request), order=None).last()
         discount_total_price, discount_total_saved = discount_total(total_price + default_shipping_rate, discount)
