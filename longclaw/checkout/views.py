@@ -92,7 +92,6 @@ class CheckoutView(TemplateView):
                     shipping_address=shipping_address,
                     billing_address=billing_address,
                     shipping_option=shipping_option,
-                    delivery_instructions=delivery_instructions,
                     discount=discount,
                     capture_payment=True
                 )
