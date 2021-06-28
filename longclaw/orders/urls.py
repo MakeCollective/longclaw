@@ -3,6 +3,8 @@ from longclaw.orders import api
 
 from longclaw.settings import API_URL_PREFIX
 
+from . import views
+
 orders = api.OrderViewSet.as_view({
     'get': 'retrieve'
 })
@@ -29,5 +31,6 @@ urlpatterns = [
     path(PREFIX + '<int:pk>/', orders, name='longclaw_orders'),
     path(PREFIX + '<int:pk>/fulfill/', fulfill_order, name='longclaw_fulfill_order'),
     path(PREFIX + '<int:pk>/unfulfill/', unfulfill_order, name='longclaw_unfulfill_order'),
-    path(PREFIX + '<int:pk>/refund/', refund_order, name='longclaw_refund_order')
+    path(PREFIX + '<int:pk>/refund/', refund_order, name='longclaw_refund_order'),
+    path('test-add-to-basket/', views.test_add_to_basket, name='test_add_to_basket'),
 ]
