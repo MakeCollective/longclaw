@@ -35,7 +35,7 @@ def test_add_to_basket(request):
 
 class SubscriptionIndexView(LoginRequiredMixin, View):
     login_view = reverse_lazy('login')
-    template_name = 'subscriptions/subscriptions_index.html'
+    template_name = 'longclaw/subscriptions/subscriptions_index.html'
     
     def get(self, request):
         account = request.user.account
@@ -50,7 +50,7 @@ class SubscriptionIndexView(LoginRequiredMixin, View):
     
 class SubscriptionCreateView(LoginRequiredMixin, TemplateView):
     login_view = reverse_lazy('login')
-    template_name = 'subscriptions/subscription_create.html'
+    template_name = 'longclaw/subscriptions/subscription_create.html'
     success_url = reverse_lazy('subscription_create_success')
 
     def get_context(self, request):
@@ -176,7 +176,7 @@ class SubscriptionCreateView(LoginRequiredMixin, TemplateView):
 
 class SubscriptionCreateSuccessView(LoginRequiredMixin, TemplateView):
     login_url = reverse_lazy('login')
-    template_name = 'subscriptions/subscription_create_success.html'
+    template_name = 'longclaw/subscriptions/subscription_create_success.html'
 
     
     

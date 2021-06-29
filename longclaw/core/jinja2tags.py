@@ -9,7 +9,7 @@ from .templatetags import longclawcore_tags as lc_tags
 
 
 def longclaw_vendors_bundle():
-    template = get_template('core/longclaw_script.html')
+    template = get_template('longclaw/core/longclaw_script.html')
 
     context = lc_tags.longclaw_vendors_bundle()
 
@@ -17,7 +17,7 @@ def longclaw_vendors_bundle():
 
 
 def longclaw_client_bundle():
-    template = get_template('core/longclaw_script.html')
+    template = get_template('longclaw/core/longclaw_script.html')
 
     context = lc_tags.longclaw_client_bundle()
 

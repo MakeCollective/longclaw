@@ -82,7 +82,7 @@ class DetailView(InspectView):
         return super(DetailView, self).get_context_data(**context)
 
     def get_template_names(self):
-        return 'orders_detail.html'
+        return 'longclaw/orders_detail.html'
 
 
 class OrderModelAdmin(ModelAdmin):
