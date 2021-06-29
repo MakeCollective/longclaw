@@ -40,6 +40,10 @@ INSTALLED_APPS = [
     'taggit',
     'rest_framework',
 
+    'home',
+    'search',
+    'catalog',
+
     'longclaw.core',
     'longclaw.configuration',
     'longclaw.shipping',
@@ -51,11 +55,6 @@ INSTALLED_APPS = [
     'longclaw.coupon',
     'longclaw.account',
     # 'longclaw.subscriptions',
-
-    'home',
-    'search',
-    'catalog'
-
 ]
 
 MIDDLEWARE = [
