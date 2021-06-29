@@ -128,18 +128,19 @@ class ShippingTests(LongclawTestCase):
         self.assertEqual(result['settings'], Configuration.for_site(api_request.site))
         self.assertEqual(result['name'], 'standard')
     
-    def test_create_address(self):
-        """
-        Test creating an address object via the api
-        """
-        data = {
-            'name': 'Bob Testerson',
-            'line_1': 'Bobstreet',
-            'city': 'Bobsville',
-            'postcode': 'BOB22 2BO',
-            'country': self.country.pk
-        }
-        self.post_test(data, 'longclaw_address_list')
+    # Removed because addresses should not be available to anyone
+    # def test_create_address(self):
+    #     """
+    #     Test creating an address object via the api
+    #     """
+    #     data = {
+    #         'name': 'Bob Testerson',
+    #         'line_1': 'Bobstreet',
+    #         'city': 'Bobsville',
+    #         'postcode': 'BOB22 2BO',
+    #         'country': self.country.pk
+    #     }
+    #     self.post_test(data, 'longclaw_address_list')
 
     def test_shipping_cost(self):
         sr = ShippingRateFactory(countries=[self.country])
@@ -293,58 +294,58 @@ class AddressModifiedSignalTest(LongclawTestCase):
         self.assertTrue(ShippingRate.objects.filter(pk__in=[self.rate1.pk]).exists())
         self.assertFalse(ShippingRate.objects.filter(pk__in=[self.rate2.pk, self.rate3.pk]).exists())
 
-    def test_create_address_sends_signal(self):
-        with catch_signal(address_modified) as handler:
-            self.post_test(self.address_data, 'longclaw_address_list')
+    # def test_create_address_sends_signal(self):
+    #     with catch_signal(address_modified) as handler:
+    #         self.post_test(self.address_data, 'longclaw_address_list')
         
-        handler.assert_called_once_with(
-            instance=mock.ANY,
-            sender=Address,
-            signal=address_modified,
-        )
+    #     handler.assert_called_once_with(
+    #         instance=mock.ANY,
+    #         sender=Address,
+    #         signal=address_modified,
+    #     )
 
-    def test_put_address_sends_signal(self):
-        serializer = AddressSerializer(self.address)
-        data = {}
-        data.update(serializer.data)
-        data.update(self.address_data)
+    # def test_put_address_sends_signal(self):
+    #     serializer = AddressSerializer(self.address)
+    #     data = {}
+    #     data.update(serializer.data)
+    #     data.update(self.address_data)
         
-        self.assertNotEqual(self.address.postcode, '20500')
+    #     self.assertNotEqual(self.address.postcode, '20500')
         
-        with catch_signal(address_modified) as handler:
-            response = self.put_test(data, 'longclaw_address_detail', urlkwargs={'pk': self.address.pk})
+    #     with catch_signal(address_modified) as handler:
+    #         response = self.put_test(data, 'longclaw_address_detail', urlkwargs={'pk': self.address.pk})
         
-        self.assertEqual('20500', response.data['postcode'])
+    #     self.assertEqual('20500', response.data['postcode'])
         
-        handler.assert_called_once_with(
-            instance=self.address,
-            sender=Address,
-            signal=address_modified,
-        )
+    #     handler.assert_called_once_with(
+    #         instance=self.address,
+    #         sender=Address,
+    #         signal=address_modified,
+    #     )
     
-    def test_patch_address_sends_signal(self):
-        self.assertNotEqual(self.address.postcode, '20500')
+    # def test_patch_address_sends_signal(self):
+    #     self.assertNotEqual(self.address.postcode, '20500')
         
-        with catch_signal(address_modified) as handler:
-            response = self.patch_test(self.address_data, 'longclaw_address_detail', urlkwargs={'pk': self.address.pk})
+    #     with catch_signal(address_modified) as handler:
+    #         response = self.patch_test(self.address_data, 'longclaw_address_detail', urlkwargs={'pk': self.address.pk})
         
-        self.assertEqual('20500', response.data['postcode'])
+    #     self.assertEqual('20500', response.data['postcode'])
         
-        handler.assert_called_once_with(
-            instance=self.address,
-            sender=Address,
-            signal=address_modified,
-        )
+    #     handler.assert_called_once_with(
+    #         instance=self.address,
+    #         sender=Address,
+    #         signal=address_modified,
+    #     )
     
-    def test_delete_address_sends_signal(self):
-        with catch_signal(address_modified) as handler:
-            self.del_test('longclaw_address_detail', urlkwargs={'pk': self.address.pk})
+    # def test_delete_address_sends_signal(self):
+    #     with catch_signal(address_modified) as handler:
+    #         self.del_test('longclaw_address_detail', urlkwargs={'pk': self.address.pk})
         
-        handler.assert_called_once_with(
-            instance=mock.ANY,
-            sender=Address,
-            signal=address_modified,
-        )
+    #     handler.assert_called_once_with(
+    #         instance=mock.ANY,
+    #         sender=Address,
+    #         signal=address_modified,
+    #     )
 
 
 class AddressFormTest(TestCase):
