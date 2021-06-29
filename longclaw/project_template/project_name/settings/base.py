@@ -50,7 +50,7 @@ INSTALLED_APPS = [
     'longclaw.stats',
     'longclaw.coupon',
     'longclaw.account',
-    'longclaw.subscriptions',
+    # 'longclaw.subscriptions',
 
     'home',
     'search',

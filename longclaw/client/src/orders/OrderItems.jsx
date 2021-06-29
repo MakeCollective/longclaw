@@ -21,12 +21,12 @@ const OrderItems = ({items, subTotal, shippingRate, discountTotal, discountValue
     {items.map(item => (
       <tr key={item.id}>
         <td>
-          <a href={`/admin/pages/${item.product.product.id}/edit/`}>
-            {item.product.product.title}
+          <a href={`/admin/pages/${item.base_product_id}/edit/`}>
+            {item.product_variant_title}
           </a>
         </td>
-        <td>{item.product.ref}</td>
-        <td>{item.product.price}</td>
+        <td>{item.product_variant_ref}</td>
+        <td>{item.product_variant_price}</td>
         <td>{item.quantity}</td>
         <td>{item.total}</td>
       </tr>
