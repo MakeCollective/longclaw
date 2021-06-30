@@ -59,8 +59,8 @@ class OrderButtonHelper(ButtonHelper):
         if ph.user_can_inspect_obj(usr, obj):
             btns.append(self.detail_button(
                 pk, classnames_add, classnames_exclude))
-            btns.append(self.cancel_button(
-                pk, classnames_add, classnames_exclude))
+            # btns.append(self.cancel_button(
+            #     pk, classnames_add, classnames_exclude))
 
         return btns
 
