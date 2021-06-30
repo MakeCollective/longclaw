@@ -85,18 +85,21 @@ class Order(models.Model):
         else:
             self.status_note = "Refund failed on {}".format(now)
         self.save()
+        return self
 
     def fulfill(self):
         """Mark this order as being fulfilled
         """
         self.status = self.FULFILLED
         self.save()
+        return self
 
     def unfulfill(self):
         """Unmark this order as being fulfilled
         """
         self.status = self.SUBMITTED
         self.save()
+        return self
 
     def cancel(self, refund=True):
         """Cancel this order, optionally refunding it
@@ -105,6 +108,7 @@ class Order(models.Model):
             self.refund()
         self.status = self.CANCELLED
         self.save()
+        return self
 
 
 class OrderItem(models.Model):
