@@ -24,8 +24,8 @@ class OrderViewSet(viewsets.ModelViewSet):
         """Refund the order specified by the pk
         """
         order = Order.objects.get(id=pk)
-        order.refund()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        order = order.refund()
+        return Response(JSONRenderer().render(self.get_serializer(order).data))
 
     @action(detail=True, methods=['post'])
     def fulfill_order(self, request, pk):
