@@ -14,7 +14,7 @@ def longclaw_vendors_bundle():
     )
     return {'path': VENDORS_PATH}
 
-@register.inclusion_tag("core/script.html")
+@register.inclusion_tag("longclaw/core/script.html")
 def longclaw_client_bundle():
     assert os.path.exists(
         os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static', CLIENT_PATH)
