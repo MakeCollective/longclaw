@@ -5,6 +5,8 @@ from rest_framework.pagination import LimitOffsetPagination
 from longclaw.orders.models import Order
 from longclaw.orders.serializers import OrderSerializer
 
+from rest_framework.renderers import JSONRenderer
+
 
 class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
@@ -30,16 +32,16 @@ class OrderViewSet(viewsets.ModelViewSet):
         """Mark the order specified by pk as fulfilled
         """
         order = Order.objects.get(id=pk)
-        order.fulfill()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        order = order.fulfill()
+        return Response(JSONRenderer().render(self.get_serializer(order).data))
 
     @action(detail=True, methods=['post'])
     def unfulfill_order(self, request, pk):
         """Unmark the order specified by pk as fulfilled
         """
         order = Order.objects.get(id=pk)
-        order.unfulfill()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        order = order.unfulfill()
+        return Response(JSONRenderer().render(self.get_serializer(order).data))
 
     @action(detail=False, methods=['get'])
     def order_statuses(self, request):
