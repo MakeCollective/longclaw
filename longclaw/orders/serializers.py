@@ -8,6 +8,7 @@ from longclaw.shipping.serializers import AddressSerializer
 class OrderItemSerializer(serializers.ModelSerializer):
 
     product = ProductVariantSerializer()
+    total = serializers.ReadOnlyField()
 
     class Meta:
         model = OrderItem
