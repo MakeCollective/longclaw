@@ -7,8 +7,13 @@ from wagtail.contrib.modeladmin.options import (
 )
 from wagtail.contrib.modeladmin.helpers import ButtonHelper
 from wagtail.contrib.modeladmin.views import InspectView
+
+from rest_framework.renderers import JSONRenderer
+
 from longclaw.orders.models import Order
+from longclaw.orders.serializers import OrderSerializer
 from longclaw.settings import API_URL_PREFIX
+
 
 class OrderButtonHelper(ButtonHelper):
 
@@ -76,7 +81,9 @@ class DetailView(InspectView):
     def get_context_data(self, **kwargs):
         context = {
             'order_id': self.instance.id,
-            'api_url_prefix': API_URL_PREFIX
+            'api_url_prefix': API_URL_PREFIX,
+            'order_serialized': JSONRenderer().render(OrderSerializer(self.instance).data),
+            'order_statuses': Order.ORDER_STATUSES,
         }
         context.update(kwargs)
         return super(DetailView, self).get_context_data(**context)
