@@ -100,7 +100,7 @@ class OrderModelAdmin(ModelAdmin):
     exclude_from_explorer = False
     list_display = ('id', 'status', 'status_note', 'email',
                     'payment_date', 'total_items', 'final_payment') # 'total')
-    list_filter = ('status', 'payment_date', 'email')
+    list_filter = ('status', 'payment_date')
     inspect_view_enabled = True
     detail_view_class = DetailView
     button_helper_class = OrderButtonHelper
