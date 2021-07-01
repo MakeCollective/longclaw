@@ -226,7 +226,7 @@ const app = new Vue({
             })
             .then(response => response.json())
             .then(data => {
-                this.order = JSON.parse(data);
+                this.order = data;
             });
         },
         handleUnfulfill: function() {
@@ -238,7 +238,7 @@ const app = new Vue({
             })
             .then(response => response.json())
             .then(data => {
-                this.order = JSON.parse(data);
+                this.order = data;
             });
         },
         handleRefund: function() {
@@ -250,7 +250,7 @@ const app = new Vue({
             })
             .then(response => response.json())
             .then(data => {
-                this.order = JSON.parse(data);
+                this.order = data;
             });
         },
     },

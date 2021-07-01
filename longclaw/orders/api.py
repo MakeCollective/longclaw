@@ -5,8 +5,6 @@ from rest_framework.pagination import LimitOffsetPagination
 from longclaw.orders.models import Order
 from longclaw.orders.serializers import OrderSerializer
 
-from rest_framework.renderers import JSONRenderer
-
 
 class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
@@ -25,7 +23,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         """
         order = Order.objects.get(id=pk)
         order = order.refund()
-        return Response(JSONRenderer().render(self.get_serializer(order).data))
+        return Response(self.get_serializer(order).data)
 
     @action(detail=True, methods=['post'])
     def fulfill_order(self, request, pk):
@@ -33,7 +31,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         """
         order = Order.objects.get(id=pk)
         order = order.fulfill()
-        return Response(JSONRenderer().render(self.get_serializer(order).data))
+        return Response(self.get_serializer(order).data)
 
     @action(detail=True, methods=['post'])
     def unfulfill_order(self, request, pk):
@@ -41,8 +39,14 @@ class OrderViewSet(viewsets.ModelViewSet):
         """
         order = Order.objects.get(id=pk)
         order = order.unfulfill()
-        return Response(JSONRenderer().render(self.get_serializer(order).data))
+        return Response(self.get_serializer(order).data)
 
     @action(detail=False, methods=['get'])
     def order_statuses(self, request):
         return Response({value: text for value, text in Order.ORDER_STATUSES}, status=200)
+
+    @action(detail=False, methods=['post'])
+    def set_order_status(self, request, pk, status_code):
+        order = Order.objects.get(id=pk)
+        order.set_status(status_code)
+        return Response(self.get_serializer(order).data)
