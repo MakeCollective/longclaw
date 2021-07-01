@@ -98,7 +98,7 @@ class OrderModelAdmin(ModelAdmin):
     menu_icon = 'list-ul'
     add_to_settings_menu = False
     exclude_from_explorer = False
-    list_display = ('id', 'status', 'status_note', 'email',
+    list_display = ('id', 'status', 'email',
                     'payment_date', 'total_items', 'final_payment') # 'total')
     list_filter = ('status', 'payment_date')
     inspect_view_enabled = True
