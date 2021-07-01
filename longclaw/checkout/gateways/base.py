@@ -1,4 +1,5 @@
 from longclaw.checkout.errors import PaymentError
+from decimal import Decimal
 
 class BasePayment(object):
     """
@@ -45,5 +46,5 @@ class BasePayment(object):
         identifier is a id string to pass to the gateway
         in order to identify the transaction to refund.
         """
-        assert isinstance(amount, (float, int))
+        assert isinstance(amount, (float, int, Decimal))
         return True
