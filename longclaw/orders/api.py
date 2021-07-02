@@ -5,12 +5,44 @@ from rest_framework.pagination import LimitOffsetPagination
 from longclaw.orders.models import Order
 from longclaw.orders.serializers import OrderSerializer
 
+from collections import OrderedDict
+
+
+class OrderLimitOffsetPagination(LimitOffsetPagination):
+    def get_paginated_response(self, data):
+
+        count = self.count
+        next_link = self.get_next_link()
+        next_params = {'limit': self.limit, 'offset': min(self.offset + self.limit, self.count)}
+        previous_link = self.get_previous_link()
+        previous_params = {'limit': self.limit, 'offset': max(self.offset - self.limit, 0)}
+
+        od = OrderedDict([
+            ('count', count),
+            ('next', next_link),
+        ])
+        
+        if next_link:
+            od.update({'next_params': next_params})
+        else:
+            od.update({'next_params': None})
+
+        od.update({'previous': previous_link,})
+        if previous_link:
+            od.update({'previous_params': previous_params})
+        else:
+            od.update({'previous_params': None})
+
+        od.update({'results': data})
+        
+        return Response(od)
+
 
 class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
     permission_classes = [permissions.IsAuthenticated]
     queryset = Order.objects.all()
-    pagination_class = LimitOffsetPagination
+    pagination_class = OrderLimitOffsetPagination
     filter_backends = [filters.SearchFilter]
     search_fields = [
         '=id', 'email', 
