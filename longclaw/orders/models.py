@@ -109,6 +109,13 @@ class Order(models.Model):
         self.status = self.CANCELLED
         self.save()
         return self
+    
+    def update_shipping_status(self, new_shipping_status):
+        """Update the shipping status of the Order with the one provided
+        """
+        self.shipping_status = new_shipping_status
+        self.save()
+        return self
 
 
 class OrderItem(models.Model):
