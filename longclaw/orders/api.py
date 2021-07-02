@@ -49,6 +49,19 @@ class OrderViewSet(viewsets.ModelViewSet):
         'shipping_address__name', 'shipping_address__city',
     ]
 
+    def get_queryset(self):
+        '''
+        Checks for filters specific fields available:
+        - status (integer)
+            - Is the status code of the available statuses, e.g. "Awaiting dispatch" is code 1
+        '''
+        queryset = super().get_queryset()
+        status = self.request.query_params.get('status')
+        if status is not None:
+            queryset = queryset.filter(status=status)
+        
+        return queryset
+
     @action(detail=True, methods=['post'])
     def refund_order(self, request, pk):
         """Refund the order specified by the pk
