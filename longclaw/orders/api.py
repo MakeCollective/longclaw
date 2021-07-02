@@ -43,7 +43,7 @@ class OrderViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     queryset = Order.objects.all()
     pagination_class = OrderLimitOffsetPagination
-    filter_backends = [filters.SearchFilter]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = [
         '=id', 'email', 
         'shipping_address__name', 'shipping_address__city',
