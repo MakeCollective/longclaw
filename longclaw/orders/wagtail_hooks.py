@@ -10,9 +10,12 @@ from wagtail.contrib.modeladmin.views import InspectView
 
 from rest_framework.renderers import JSONRenderer
 
-from longclaw.orders.models import Order
 from longclaw.orders.serializers import OrderSerializer
 from longclaw.settings import API_URL_PREFIX
+
+from django.apps import apps
+from longclaw.settings import ORDER_MODEL
+Order = apps.get_model(*ORDER_MODEL.split('.'))
 
 
 class OrderButtonHelper(ButtonHelper):

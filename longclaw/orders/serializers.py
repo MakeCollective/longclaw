@@ -1,9 +1,14 @@
 from rest_framework import serializers
-from longclaw.orders.models import Order, OrderItem
+from longclaw.orders.models import OrderItem
 from longclaw.coupon.models import Discount
 from longclaw.coupon.utils import discount_total
 from longclaw.products.serializers import ProductVariantSerializer
 from longclaw.shipping.serializers import AddressSerializer
+
+from django.apps import apps
+from longclaw.settings import ORDER_MODEL
+Order = apps.get_model(*ORDER_MODEL.split('.'))
+
 
 class OrderItemSerializer(serializers.ModelSerializer):
 

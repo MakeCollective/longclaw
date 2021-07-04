@@ -18,6 +18,10 @@ from longclaw.coupon.utils import discount_total
 from longclaw.shipping.models.rates import ShippingRate
 from longclaw.configuration.models import Configuration
 
+from django.apps import apps
+from longclaw.settings import ORDER_MODEL
+Order = apps.get_model(*ORDER_MODEL.split('.'))
+
 @require_GET
 def checkout_success(request, pk):
     order = get_object_or_404(Order, id=pk)
@@ -33,9 +37,7 @@ class CheckoutView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(CheckoutView, self).get_context_data(**kwargs)
         items, _ = get_basket_items(self.request)
-        total_price = sum(item.total() for item in items)
-        discount = Discount.objects.filter(basket_id=basket_id(self.request), order=None).last()
-        discount_total_price, discount_total_saved = discount_total(total_price, discount)
+        
         site = getattr(self.request, 'site', None)
         context['checkout_form'] = self.checkout_form(
             self.request.POST or None)
@@ -61,9 +63,7 @@ class CheckoutView(TemplateView):
         context['discount'] = discount
         context['discount_total_price'] = round(discount_total_price, 2)
         context['discount_total_saved'] = round(discount_total_saved, 2)
-
         context['default_shipping_rate'] = round(default_shipping_rate, 2)
-
         context['discount_plus_shipping'] = round(discount_total_price + default_shipping_rate, 2)
         context['total_plus_shipping'] = round(total_price + default_shipping_rate, 2)
         return context
