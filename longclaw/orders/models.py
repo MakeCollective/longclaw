@@ -42,6 +42,8 @@ class Order(models.Model):
                                     
     receipt_email_sent = models.BooleanField(default=False)
 
+    total_paid = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
+
     def __str__(self):
         return "Order #{} - {}".format(self.id, self.email)
 
