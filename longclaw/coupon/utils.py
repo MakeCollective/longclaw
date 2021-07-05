@@ -42,7 +42,7 @@ def discount_total(total, discount=None):
     # check what type of discount it is and apply the value appropriately
     if discount.coupon.discount_type == 'percentage':
         # do percentage stuff
-        new_total, amount_saved = discount_percentage(total, discount.coupon.discount_value)
+        new_total, amount_saved = discount_percentage(total, Decimal(discount.coupon.discount_value))
     elif discount.coupon.discount_type == 'dollar':
         new_total, amount_saved = discount_dollar(total, discount.coupon.discount_value)
     else:
