@@ -83,11 +83,10 @@ class BasketViewSet(viewsets.ModelViewSet):
         bid = utils.basket_id(request)
         
         variant = ProductVariant.objects.get(id=variant_id)
-        quantity = int(request.data.get("quantity", 1))
         try:
             item = BasketItem.objects.get(
                 basket_id=bid, variant=variant)
-            item.decrease_quantity(quantity)
+            item.delete()
         except BasketItem.DoesNotExist:
             pass
 

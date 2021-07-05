@@ -33,7 +33,7 @@ def remove_all_users(request):
 
 class LandingView(LoginRequiredMixin, View):
     login_url = reverse_lazy('login')
-    template_name = 'account/landing.html'
+    template_name = 'longclaw/account/landing.html'
 
     def get(self, request):
         context = {}
@@ -42,7 +42,7 @@ class LandingView(LoginRequiredMixin, View):
 
 
 class SignupView(View):
-    template_name = 'account/signup.html'
+    template_name = 'longclaw/account/signup.html'
     success_url = reverse_lazy('account_landing')
 
     def get(self, request):
@@ -119,7 +119,7 @@ class DetailsView(LoginRequiredMixin, View):
     View for a User to see their own general details
     '''
     login_url = reverse_lazy('login')
-    template_name = 'account/details.html'
+    template_name = 'longclaw/account/details.html'
 
     def get(self, request):
         context = {
@@ -135,7 +135,7 @@ class DetailsEditView(LoginRequiredMixin, View):
     View for a User to change and save their general Account details
     '''
     login_url = reverse_lazy('login')
-    template_name = 'account/details_edit.html'
+    template_name = 'longclaw/account/details_edit.html'
     success_url = reverse_lazy('account_details')
 
     def get(self, request):
@@ -249,7 +249,7 @@ class DetailsEditView(LoginRequiredMixin, View):
 
 
 class LoginView(auth_views.LoginView):
-    template_name = 'account/login.html'
+    template_name = 'longclaw/account/login.html'
     form_class = LoginForm
 
     def get_success_url(self):
@@ -263,11 +263,11 @@ class LoginView(auth_views.LoginView):
 
 
 class LogoutView(auth_views.LogoutView):
-    template_name = 'account/logout.html'
+    template_name = 'longclaw/account/logout.html'
 
 
 class PasswordChangeView(auth_views.PasswordChangeView):
-    template_name = 'account/password/password_change.html'
+    template_name = 'longclaw/account/password/password_change.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -276,22 +276,22 @@ class PasswordChangeView(auth_views.PasswordChangeView):
 
 
 class PasswordChangeDoneView(auth_views.PasswordChangeDoneView):
-    template_name = 'account/password/password_change_done.html'
+    template_name = 'longclaw/account/password/password_change_done.html'
 
 
 class PasswordResetView(auth_views.PasswordResetView):
-    template_name = 'account/password/password_reset.html'
+    template_name = 'longclaw/account/password/password_reset.html'
 
 
 class PasswordResetDoneView(auth_views.PasswordResetDoneView):
-    template_name = 'account/password/password_reset_done.html'
+    template_name = 'longclaw/account/password/password_reset_done.html'
 
 
 class PasswordResetConfirmView(auth_views.PasswordResetConfirmView):
-    template_name = 'account/password/password_reset_confirm.html'
+    template_name = 'longclaw/account/password/password_reset_confirm.html'
 
 
 class PasswordResetCompleteView(auth_views.PasswordResetCompleteView):
-    template_name = 'account/password/password_reset_complete.html'
+    template_name = 'longclaw/account/password/password_reset_complete.html'
 
 

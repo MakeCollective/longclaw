@@ -42,6 +42,8 @@ class Order(models.Model):
                                     
     receipt_email_sent = models.BooleanField(default=False)
 
+    total_paid = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
+
     def __str__(self):
         return "Order #{} - {}".format(self.id, self.email)
 
@@ -85,18 +87,21 @@ class Order(models.Model):
         else:
             self.status_note = "Refund failed on {}".format(now)
         self.save()
+        return self
 
     def fulfill(self):
         """Mark this order as being fulfilled
         """
         self.status = self.FULFILLED
         self.save()
+        return self
 
     def unfulfill(self):
         """Unmark this order as being fulfilled
         """
         self.status = self.SUBMITTED
         self.save()
+        return self
 
     def cancel(self, refund=True):
         """Cancel this order, optionally refunding it
@@ -105,6 +110,14 @@ class Order(models.Model):
             self.refund()
         self.status = self.CANCELLED
         self.save()
+        return self
+    
+    def update_shipping_status(self, new_shipping_status):
+        """Update the shipping status of the Order with the one provided
+        """
+        self.shipping_status = new_shipping_status
+        self.save()
+        return self
 
 
 class OrderItem(models.Model):

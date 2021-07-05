@@ -17,6 +17,10 @@ PAYMENT_GATEWAY = getattr(settings,
 PRODUCT_VARIANT_MODEL = getattr(
     settings, 'PRODUCT_VARIANT_MODEL', 'products.ProductVariantBase')
 
+# The order model to use. This allows custom implementation of order models
+ORDER_MODEL = getattr(
+    settings, 'ORDER_MODEL', 'orders.Order')
+
 
 # Only required if using Stripe as the payment gateway
 STRIPE_PUBLISHABLE = getattr(settings, 'STRIPE_PUBLISHABLE', '')

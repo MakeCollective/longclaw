@@ -39,6 +39,13 @@ INSTALLED_APPS = [
     'modelcluster',
     'taggit',
     'rest_framework',
+    'rest_framework.authtoken',
+    'dj_rest_auth',
+    'corsheaders',
+
+    'home',
+    'search',
+    'catalog',
 
     'longclaw.core',
     'longclaw.configuration',
@@ -51,11 +58,6 @@ INSTALLED_APPS = [
     'longclaw.coupon',
     'longclaw.account',
     # 'longclaw.subscriptions',
-
-    'home',
-    'search',
-    'catalog'
-
 ]
 
 MIDDLEWARE = [
@@ -154,5 +156,12 @@ PAYMENT_GATEWAY = 'longclaw.checkout.gateways.BasePayment'
 PRODUCT_VARIANT_MODEL = 'catalog.ProductVariant'
 
 AUTHENTICATION_BACKENDS = ['longclaw.account.authentication_backend.EmailBackend']
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+}
 
 ACCOUNT_REQUIRES_EMAIL_VERIFICATION = True
