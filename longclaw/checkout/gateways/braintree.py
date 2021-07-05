@@ -18,7 +18,7 @@ class BraintreePayment(BasePayment):
                                           public_key=settings.BRAINTREE_PUBLIC_KEY,
                                           private_key=settings.BRAINTREE_PRIVATE_KEY)
 
-    def create_payment(self, request, amount, description=''):
+    def create_payment(self, request, amount, description='', metadata={}):
         nonce = request.POST.get('payment_method_nonce')
         result = braintree.Transaction.sale({
             "amount": str(amount),
