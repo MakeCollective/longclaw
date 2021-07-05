@@ -23,6 +23,9 @@ def longclaw_client_bundle():
 
 @register.simple_tag
 def longclaw_api_url_prefix():
-    return settings.API_URL_PREFIX
+    if settings.API_URL_PREFIX[0] != '/':
+        return f'/{settings.API_URL_PREFIX}'
+    else:
+        return settings.API_URL_PREFIX
 
 
