@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('catalog', '0001_initial'),
-        ('orders', '0003_order_item_add_snapshot_fields'),
+        ('orders', '0003_order_item_snapshot_fields'),
     ]
 
     operations = [
