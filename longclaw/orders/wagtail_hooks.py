@@ -74,6 +74,7 @@ class OrderButtonHelper(ButtonHelper):
 
 
 class DetailView(InspectView):
+    order_serializer = OrderSerializer
 
     def get_page_title(self, **kwargs):
         return "Order #{}".format(self.instance.id)
@@ -85,7 +86,7 @@ class DetailView(InspectView):
         context = {
             'order_id': self.instance.id,
             'api_url_prefix': API_URL_PREFIX,
-            'order_serialized': JSONRenderer().render(OrderSerializer(self.instance).data),
+            'order_serialized': JSONRenderer().render(self.order_serializer(self.instance).data),
             'order_statuses': Order.ORDER_STATUSES,
         }
         context.update(kwargs)
