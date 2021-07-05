@@ -17,11 +17,13 @@
             v-if="order.status == 1"
             text="Fulfill"
             @activate="handleFulfill"
+            :disabled="loading"
         ></action-button>
         <action-button
             v-if="order.status == 2"
             text="Unfulfill"
             @activate="handleUnfulfill"
+            :disabled="loading"
         ></action-button>
         <action-button
             v-if="order.status == 1 || order.status == 2"
@@ -63,7 +65,7 @@
         <div class="col4">
             <dl>
                 <dt>Status Note</dt>
-                <dt><% order.status_note %></dt>
+                <dd><% order.status_note %></dd>
             </dl>
         </div>
     </div>
@@ -169,7 +171,7 @@ const app = new Vue({
     data: function() {
         return {
             url_prefix: '/{{api_url_prefix}}',
-            loading: true,
+            loading: false,
             order: {{order_serialized.decode|safe}},
             order_statuses: {
                 {% for status in order_statuses %}
@@ -218,6 +220,7 @@ const app = new Vue({
     },
     methods: {
         handleFulfill: function() {
+            this.loading = true;
             longclawclient.fulfillOrder.post({
                 prefix: this.url_prefix,
                 urlParams: {
@@ -226,10 +229,12 @@ const app = new Vue({
             })
             .then(response => response.json())
             .then(data => {
+                this.loading = false;
                 this.order = data;
             });
         },
         handleUnfulfill: function() {
+            this.loading = true;
             longclawclient.unfulfillOrder.post({
                 prefix: this.url_prefix,
                 urlParams: {
@@ -238,10 +243,12 @@ const app = new Vue({
             })
             .then(response => response.json())
             .then(data => {
+                this.loading = false;
                 this.order = data;
             });
         },
         handleRefund: function() {
+            this.loading = true;
             longclawclient.refundOrder.post({
                 prefix: this.url_prefix,
                 urlParams: {
@@ -250,6 +257,7 @@ const app = new Vue({
             })
             .then(response => response.json())
             .then(data => {
+                this.loading = false;
                 this.order = data;
             });
         },
