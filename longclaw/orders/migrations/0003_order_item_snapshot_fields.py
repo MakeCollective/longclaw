@@ -5,25 +5,6 @@ import django.db.models.deletion
 import django.utils.timezone
 
 
-def create_order_item_snapshots(apps, schema_editor):
-    order_items = apps.get_model('orders', 'OrderItem')
-    for item in order_items.objects.all():
-        if item.product:
-            item.base_product_id = item.product.product.id
-            item.product_variant_id = item.product.id
-            item.product_variant_price = item.product.base_price
-            item.product_variant_ref = item.product.ref
-            if item.product.product:
-                item.product_variant_title = item.product.product.title
-            else:
-                item.product_variant_title = item.product.ref
-            item.save()
-
-def create_order_item_snapshots_reverse(apps, schema_editor):
-    # This function used for reversing the migration, not required in this case
-    pass
-
-
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -73,34 +54,5 @@ class Migration(migrations.Migration):
             model_name='orderitem',
             name='product',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='catalog.productvariant'),
-        ),
-
-        # Run python to update these values using the product foreign key
-        migrations.RunPython(create_order_item_snapshots, create_order_item_snapshots_reverse),
-
-        migrations.AlterField(
-            model_name='orderitem',
-            name='base_product_id',
-            field=models.IntegerField(),
-        ),
-        migrations.AlterField(
-            model_name='orderitem',
-            name='product_variant_id',
-            field=models.IntegerField(),
-        ),
-        migrations.AlterField(
-            model_name='orderitem',
-            name='product_variant_price',
-            field=models.DecimalField(decimal_places=2, max_digits=12),
-        ),
-        migrations.AlterField(
-            model_name='orderitem',
-            name='product_variant_ref',
-            field=models.CharField(max_length=32),
-        ),
-        migrations.AlterField(
-            model_name='orderitem',
-            name='product_variant_title',
-            field=models.CharField(max_length=255),
         ),
     ]
