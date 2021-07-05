@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='order',
-            name='receipt_order_email',
+            name='receipt_email_sent',
             field=models.BooleanField(default=False),
         ),
     ]
