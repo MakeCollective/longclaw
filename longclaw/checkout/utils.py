@@ -89,6 +89,8 @@ def create_order(email,
         billing_address=billing_address,
         shipping_rate=shipping_rate,
     )
+    if request.user.account:
+        order.account = request.user.account
     order.save()
 
     # Create the order items & compute total
