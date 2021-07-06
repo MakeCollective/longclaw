@@ -1,12 +1,12 @@
 <!--
     Will contain forms for changing general account details
 -->
-{% extends "account/account_base.html" %}
+{% extends "longclaw/account/account_base.html" %}
 
 {% block content %}
 <h1>Account details edit page</h1>
 
-{% comment %} {% include 'account/account_details_table.html' %} {% endcomment %}
+{% comment %} {% include 'longclaw/account/account_details_table.html' %} {% endcomment %}
 <form action="." method='post'>
     {% csrf_token %}
     <div class="user-form-fields">
@@ -55,7 +55,7 @@
     </div>
 </form>
 
-{% include 'account/account_nav.html' %}
+{% include 'longclaw/account/account_nav.html' %}
 {% endblock %}
 
 {% block extra_js %}

@@ -2,12 +2,12 @@
     The main hub for the account, has summary views and links to various things,
     i.e. account details, subscription details, payment settings
 -->
-{% extends "account/account_base.html" %}
+{% extends "longclaw/account/account_base.html" %}
 
 {% block content %}
 <h1>Account landing page</h1>
 
-{% include 'account/account_details_table.html' %}
+{% include 'longclaw/account/account_details_table.html' %}
 
 {% comment %} 
 <h3>Subscriptions</h3>
@@ -20,5 +20,5 @@
 </div> 
 {% endcomment %}
 
-{% include 'account/account_nav.html' %}
+{% include 'longclaw/account/account_nav.html' %}
 {% endblock content %}

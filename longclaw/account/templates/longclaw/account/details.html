@@ -1,12 +1,12 @@
 <!--
     Page for viewing account specific details, e.g. addresses, subscription status or whatever
 -->
-{% extends "account/account_base.html" %}
+{% extends "longclaw/account/account_base.html" %}
 
 {% block content %}
 <h1>Account details page</h1>
 
-{% include 'account/account_details_table.html' %}
+{% include 'longclaw/account/account_details_table.html' %}
 
 <div class="action-buttons">
     <a class="button" href="{{account_details_edit_url}}">Edit details</a>
@@ -25,5 +25,5 @@
 </div> 
 {% endcomment %}
 
-{% include 'account/account_nav.html' %}
+{% include 'longclaw/account/account_nav.html' %}
 {% endblock content %}
