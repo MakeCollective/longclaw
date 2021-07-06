@@ -5,6 +5,7 @@ from longclaw.orders.models import Order
 from longclaw.stats import stats
 from longclaw.configuration.models import Configuration
 from longclaw.utils import ProductVariant, maybe_get_product_model
+from django.conf import settings
 
 
 class LongclawSummaryItem(SummaryItem):
@@ -26,7 +27,7 @@ class OutstandingOrders(LongclawSummaryItem):
         return {
             'total': orders.count(),
             'text': 'Outstanding Orders',
-            'url': '/admin/orders/order/',
+            'url': settings.ORDER_LIST_VIEW_URL,
             'icon': 'icon-warning'
         }
 
