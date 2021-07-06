@@ -43,6 +43,7 @@ class Order(models.Model):
     receipt_email_sent = models.BooleanField(default=False)
 
     total_paid = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
+    account = models.ForeignKey('account.Account', related_name='orders', blank=True, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return "Order #{} - {}".format(self.id, self.email)
