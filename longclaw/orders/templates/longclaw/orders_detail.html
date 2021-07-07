@@ -40,7 +40,7 @@
             </dl>
             <dl>
                 <dt>Shipping Address</dt>
-                <dd>
+                <dd v-if="order.shipping_address">
                     <address>
                         <% order.shipping_address.name %><br>
                         <% order.shipping_address.line_1 %><br>
