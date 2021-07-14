@@ -5,7 +5,6 @@ from django.contrib.auth.models import User
 from wagtail.snippets.models import register_snippet
 
 
-@register_snippet
 class Account(models.Model):
     '''
     Hold details about a user. Details include at a minimum the amount of information
