@@ -52,15 +52,6 @@ class SignupView(View):
             'billing_address_form': AddressForm(prefix='billing_address', use_required_attribute=False),
             'shipping_billing_address_same': True,
         }
-
-        context['user_form'].fields['first_name'].widget.attrs['value'] = 'Blake'
-        context['user_form'].fields['last_name'].widget.attrs['value'] = 'Gilmore'
-        context['user_form'].fields['company_name'].widget.attrs['value'] = 'Blake\'s Fancy Company'
-        context['user_form'].fields['email'].widget.attrs['value'] = 'pearlywite@hotmail.com'
-        context['user_form'].fields['phone'].widget.attrs['value'] = '0275899010'
-        context['user_form'].fields['password'].widget.attrs['value'] = 'testpassword'
-        context['user_form'].fields['password_confirmation'].widget.attrs['value'] = 'testpassword'
-        
         return render(request, self.template_name, context=context)
     
     def post(self, request):
