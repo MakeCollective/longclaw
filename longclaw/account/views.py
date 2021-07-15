@@ -44,12 +44,14 @@ class LandingView(LoginRequiredMixin, View):
 class SignupView(View):
     template_name = 'longclaw/account/signup.html'
     success_url = reverse_lazy('account_landing')
+    signup_form = SignupForm
+    address_form = AddressForm
 
     def get(self, request):
         context = {
-            'user_form': SignupForm(prefix='user_form'),
-            'shipping_address_form': AddressForm(prefix='shipping_address'),
-            'billing_address_form': AddressForm(prefix='billing_address', use_required_attribute=False),
+            'user_form': self.signup_form(prefix='user_form'),
+            'shipping_address_form': self.address_form(prefix='shipping_address'),
+            'billing_address_form': self.address_form(prefix='billing_address', use_required_attribute=False),
             'shipping_billing_address_same': True,
         }
         return render(request, self.template_name, context=context)
@@ -57,14 +59,14 @@ class SignupView(View):
     def post(self, request):
 
         # validate forms
-        user_form = SignupForm(request.POST, prefix='user_form')
-        shipping_address_form = AddressForm(request.POST, prefix='shipping_address')
+        user_form = self.signup_form(request.POST, prefix='user_form')
+        shipping_address_form = self.address_form(request.POST, prefix='shipping_address')
 
         shipping_billing_address_same = request.POST.get('shipping_billing_address_same')
         if not shipping_billing_address_same:
-            billing_address_form = AddressForm(request.POST, prefix='billing_address', use_required_attribute=False)
+            billing_address_form = self.address_form(request.POST, prefix='billing_address', use_required_attribute=False)
         else:
-            billing_address_form = AddressForm(prefix='billing_address', use_required_attribute=False)
+            billing_address_form = self.address_form(prefix='billing_address', use_required_attribute=False)
 
 
         errors = False
