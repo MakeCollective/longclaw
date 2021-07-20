@@ -47,13 +47,17 @@ class SignupView(View):
     signup_form = SignupForm
     address_form = AddressForm
 
-    def get(self, request):
+    def get_context_data(self, request):
         context = {
             'user_form': self.signup_form(prefix='user_form'),
             'shipping_address_form': self.address_form(prefix='shipping_address'),
             'billing_address_form': self.address_form(prefix='billing_address', use_required_attribute=False),
             'shipping_billing_address_same': True,
         }
+        return context
+
+    def get(self, request):
+        context = self.get_context_data(request)
         return render(request, self.template_name, context=context)
     
     def post(self, request):
@@ -131,19 +135,25 @@ class DetailsEditView(LoginRequiredMixin, View):
     template_name = 'longclaw/account/details_edit.html'
     success_url = reverse_lazy('account_details')
 
-    def get(self, request):
+    def get_context_data(self, request):
+        context = {}
+
         account = request.user.account
         account_dict = self.get_account_dict(account)
         shipping_address_dict = self.get_shipping_address_dict(account)
         billing_address_dict = self.get_billing_address_dict(account)
 
-        context = {
+        context.update({
             'account_form': AccountForm(prefix='account_form', initial=account_dict),
             'shipping_address_form': AddressForm(prefix='shipping_address', initial=shipping_address_dict),
             'billing_address_form': AddressForm(prefix='billing_address', initial=billing_address_dict, use_required_attribute=False),
             'shipping_billing_address_same': account.shipping_billing_address_same,
             'account_details_url': reverse('account_details'),
-        }
+        })
+        return context
+
+    def get(self, request):
+        context = self.get_context_data(request)
 
         return render(request, self.template_name, context=context)
 
