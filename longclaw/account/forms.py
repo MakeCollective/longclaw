@@ -140,7 +140,7 @@ class LoginForm(AuthenticationForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['username'].label = 'Username or email address'
+        self.fields['username'].label = 'Email'
 
     def clean(self, *args, **kwargs):
         
