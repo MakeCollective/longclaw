@@ -13,14 +13,15 @@ class StripePayment(BasePayment):
     def __init__(self):
         stripe.api_key = STRIPE_SECRET
 
-    def create_payment(self, request, amount, description=''):
+    def create_payment(self, request, amount, description='', metadata={}):
         try:
             currency = Configuration.for_request(request).currency
             charge = stripe.Charge.create(
                 amount=int(math.ceil(amount * 100)),  # Amount in pence
                 currency=currency.lower(),
                 source=request.POST.get('stripeToken'),
-                description=description
+                description=description,
+                metadata=metadata,
             )
             return charge.id
         except stripe.error.CardError as error:

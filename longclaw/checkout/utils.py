@@ -89,6 +89,8 @@ def create_order(email,
         billing_address=billing_address,
         shipping_rate=shipping_rate,
     )
+    if request.user.account:
+        order.account = request.user.account
     order.save()
 
     # Create the order items & compute total
@@ -97,8 +99,13 @@ def create_order(email,
         total += item.total()
         order_item = OrderItem(
             product=item.variant,
+            base_product_id=item.variant.product.id,
+            product_variant_id=item.variant.id,
+            product_variant_price=item.variant.price,
+            product_variant_ref=item.variant.ref,
+            product_variant_title=item.variant.get_product_title(),
             quantity=item.quantity,
-            order=order
+            order=order,
         )
         order_item.save()
     

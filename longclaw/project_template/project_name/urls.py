@@ -17,6 +17,8 @@ urlpatterns = [
 
     url(r'^search/$', search_views.search, name='search'),
 
+    url(r'^dj-rest-auth/', include('dj_rest_auth.urls')),
+
     url(r'', include(longclaw_urls)),
     url(r'', include(wagtail_urls))
 ]

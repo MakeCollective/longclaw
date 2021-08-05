@@ -33,7 +33,7 @@ def remove_all_users(request):
 
 class LandingView(LoginRequiredMixin, View):
     login_url = reverse_lazy('login')
-    template_name = 'account/landing.html'
+    template_name = 'longclaw/account/landing.html'
 
     def get(self, request):
         context = {}
@@ -42,38 +42,35 @@ class LandingView(LoginRequiredMixin, View):
 
 
 class SignupView(View):
-    template_name = 'account/signup.html'
+    template_name = 'longclaw/account/signup.html'
     success_url = reverse_lazy('account_landing')
+    signup_form = SignupForm
+    address_form = AddressForm
 
-    def get(self, request):
+    def get_context_data(self, request):
         context = {
-            'user_form': SignupForm(prefix='user_form'),
-            'shipping_address_form': AddressForm(prefix='shipping_address'),
-            'billing_address_form': AddressForm(prefix='billing_address', use_required_attribute=False),
+            'user_form': self.signup_form(prefix='user_form'),
+            'shipping_address_form': self.address_form(prefix='shipping_address'),
+            'billing_address_form': self.address_form(prefix='billing_address', use_required_attribute=False),
             'shipping_billing_address_same': True,
         }
+        return context
 
-        context['user_form'].fields['first_name'].widget.attrs['value'] = 'Blake'
-        context['user_form'].fields['last_name'].widget.attrs['value'] = 'Gilmore'
-        context['user_form'].fields['company_name'].widget.attrs['value'] = 'Blake\'s Fancy Company'
-        context['user_form'].fields['email'].widget.attrs['value'] = 'pearlywite@hotmail.com'
-        context['user_form'].fields['phone'].widget.attrs['value'] = '0275899010'
-        context['user_form'].fields['password'].widget.attrs['value'] = 'testpassword'
-        context['user_form'].fields['password_confirmation'].widget.attrs['value'] = 'testpassword'
-        
+    def get(self, request):
+        context = self.get_context_data(request)
         return render(request, self.template_name, context=context)
     
     def post(self, request):
 
         # validate forms
-        user_form = SignupForm(request.POST, prefix='user_form')
-        shipping_address_form = AddressForm(request.POST, prefix='shipping_address')
+        user_form = self.signup_form(request.POST, prefix='user_form')
+        shipping_address_form = self.address_form(request.POST, prefix='shipping_address')
 
         shipping_billing_address_same = request.POST.get('shipping_billing_address_same')
         if not shipping_billing_address_same:
-            billing_address_form = AddressForm(request.POST, prefix='billing_address', use_required_attribute=False)
+            billing_address_form = self.address_form(request.POST, prefix='billing_address', use_required_attribute=False)
         else:
-            billing_address_form = AddressForm(prefix='billing_address', use_required_attribute=False)
+            billing_address_form = self.address_form(prefix='billing_address', use_required_attribute=False)
 
 
         errors = False
@@ -119,7 +116,7 @@ class DetailsView(LoginRequiredMixin, View):
     View for a User to see their own general details
     '''
     login_url = reverse_lazy('login')
-    template_name = 'account/details.html'
+    template_name = 'longclaw/account/details.html'
 
     def get(self, request):
         context = {
@@ -135,22 +132,28 @@ class DetailsEditView(LoginRequiredMixin, View):
     View for a User to change and save their general Account details
     '''
     login_url = reverse_lazy('login')
-    template_name = 'account/details_edit.html'
+    template_name = 'longclaw/account/details_edit.html'
     success_url = reverse_lazy('account_details')
 
-    def get(self, request):
+    def get_context_data(self, request):
+        context = {}
+
         account = request.user.account
         account_dict = self.get_account_dict(account)
         shipping_address_dict = self.get_shipping_address_dict(account)
         billing_address_dict = self.get_billing_address_dict(account)
 
-        context = {
+        context.update({
             'account_form': AccountForm(prefix='account_form', initial=account_dict),
             'shipping_address_form': AddressForm(prefix='shipping_address', initial=shipping_address_dict),
             'billing_address_form': AddressForm(prefix='billing_address', initial=billing_address_dict, use_required_attribute=False),
             'shipping_billing_address_same': account.shipping_billing_address_same,
             'account_details_url': reverse('account_details'),
-        }
+        })
+        return context
+
+    def get(self, request):
+        context = self.get_context_data(request)
 
         return render(request, self.template_name, context=context)
 
@@ -249,7 +252,7 @@ class DetailsEditView(LoginRequiredMixin, View):
 
 
 class LoginView(auth_views.LoginView):
-    template_name = 'account/login.html'
+    template_name = 'longclaw/account/login.html'
     form_class = LoginForm
 
     def get_success_url(self):
@@ -263,11 +266,11 @@ class LoginView(auth_views.LoginView):
 
 
 class LogoutView(auth_views.LogoutView):
-    template_name = 'account/logout.html'
+    template_name = 'longclaw/account/logout.html'
 
 
 class PasswordChangeView(auth_views.PasswordChangeView):
-    template_name = 'account/password/password_change.html'
+    template_name = 'longclaw/account/password/password_change.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -276,22 +279,22 @@ class PasswordChangeView(auth_views.PasswordChangeView):
 
 
 class PasswordChangeDoneView(auth_views.PasswordChangeDoneView):
-    template_name = 'account/password/password_change_done.html'
+    template_name = 'longclaw/account/password/password_change_done.html'
 
 
 class PasswordResetView(auth_views.PasswordResetView):
-    template_name = 'account/password/password_reset.html'
+    template_name = 'longclaw/account/password/password_reset.html'
 
 
 class PasswordResetDoneView(auth_views.PasswordResetDoneView):
-    template_name = 'account/password/password_reset_done.html'
+    template_name = 'longclaw/account/password/password_reset_done.html'
 
 
 class PasswordResetConfirmView(auth_views.PasswordResetConfirmView):
-    template_name = 'account/password/password_reset_confirm.html'
+    template_name = 'longclaw/account/password/password_reset_confirm.html'
 
 
 class PasswordResetCompleteView(auth_views.PasswordResetCompleteView):
-    template_name = 'account/password/password_reset_complete.html'
+    template_name = 'longclaw/account/password/password_reset_complete.html'
 
 

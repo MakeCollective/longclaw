@@ -7,8 +7,16 @@ from wagtail.contrib.modeladmin.options import (
 )
 from wagtail.contrib.modeladmin.helpers import ButtonHelper
 from wagtail.contrib.modeladmin.views import InspectView
-from longclaw.orders.models import Order
+
+from rest_framework.renderers import JSONRenderer
+
+from longclaw.orders.serializers import OrderSerializer
 from longclaw.settings import API_URL_PREFIX
+
+from django.apps import apps
+from longclaw.settings import ORDER_MODEL
+Order = apps.get_model(*ORDER_MODEL.split('.'))
+
 
 class OrderButtonHelper(ButtonHelper):
 
@@ -59,13 +67,14 @@ class OrderButtonHelper(ButtonHelper):
         if ph.user_can_inspect_obj(usr, obj):
             btns.append(self.detail_button(
                 pk, classnames_add, classnames_exclude))
-            btns.append(self.cancel_button(
-                pk, classnames_add, classnames_exclude))
+            # btns.append(self.cancel_button(
+            #     pk, classnames_add, classnames_exclude))
 
         return btns
 
 
 class DetailView(InspectView):
+    order_serializer = OrderSerializer
 
     def get_page_title(self, **kwargs):
         return "Order #{}".format(self.instance.id)
@@ -76,13 +85,15 @@ class DetailView(InspectView):
     def get_context_data(self, **kwargs):
         context = {
             'order_id': self.instance.id,
-            'api_url_prefix': API_URL_PREFIX
+            'api_url_prefix': API_URL_PREFIX,
+            'order_serialized': JSONRenderer().render(self.order_serializer(self.instance).data),
+            'order_statuses': Order.ORDER_STATUSES,
         }
         context.update(kwargs)
         return super(DetailView, self).get_context_data(**context)
 
     def get_template_names(self):
-        return 'orders_detail.html'
+        return 'longclaw/orders_detail.html'
 
 
 class OrderModelAdmin(ModelAdmin):
@@ -91,9 +102,9 @@ class OrderModelAdmin(ModelAdmin):
     menu_icon = 'list-ul'
     add_to_settings_menu = False
     exclude_from_explorer = False
-    list_display = ('id', 'status', 'status_note', 'email',
+    list_display = ('id', 'status', 'email',
                     'payment_date', 'total_items', 'final_payment') # 'total')
-    list_filter = ('status', 'payment_date', 'email')
+    list_filter = ('status', 'payment_date')
     inspect_view_enabled = True
     detail_view_class = DetailView
     button_helper_class = OrderButtonHelper
