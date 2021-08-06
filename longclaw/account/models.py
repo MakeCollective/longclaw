@@ -17,7 +17,7 @@ class Account(models.Model):
     billing_address = models.ForeignKey('shipping.Address', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
     shipping_billing_address_same = models.BooleanField(default=True)
     stripe_customer_id = models.CharField(max_length=255, blank=True, null=True)
-    active_payment_method = models.ForeignKey('account.AccountPaymentMethod', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
+    active_payment_method = models.OneToOneField('account.PaymentMethod', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
         string = f'({self.id}) '
@@ -45,17 +45,31 @@ class Account(models.Model):
     # Future proofing in case an Account will have multiple payment methods (cards)
 
 
-class AccountPaymentMethod(models.Model):
+class PaymentMethod(models.Model):
     '''
     Hold details about an Account's (potentially) multiple payment methods (cards)
     Must be attached to an Account. If the attached Account is deleted, so are it's related PaymentMethods
     '''
     account = models.ForeignKey('account.Account', related_name='payment_methods', on_delete=models.CASCADE)
     name = models.CharField(max_length=255, help_text='User friendly name for the payment method')
-    stripe_id = models.CharField(max_length=255)
-
+    
     def __str__(self):
         return f'{self.name}'
+
+    def check_valid(self):
+        raise NotImplementedError
+    
+
+class StripePaymentMethod(PaymentMethod):
+    '''
+    A subclass of the PaymentMethod
+    Holds Stripe specific fields
+    '''
+    stripe_id = models.CharField(max_length=255)
+    last4 = models.CharField(max_length=255)
+    payment_type = models.CharField(max_length=255, help_text='Will most likely be "card"')
+    exp_month = models.CharField(max_length=255)
+    exp_year = models.CharField(max_length=255)
 
     def check_valid(self):
         try:
@@ -73,4 +87,3 @@ class AccountPaymentMethod(models.Model):
             raise e
 
         return True
-    
