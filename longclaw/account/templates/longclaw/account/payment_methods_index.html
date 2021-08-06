@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Payment methods index</h1>
+
+<ol>
+    {% for payment_method in payment_methods %}
+        <li>
+            <ul>
+                <li>{{payment_method.account}}</li>
+                <li>{{payment_method.name}}</li>
+                <li>{{payment_method.stripe_id}}</li>
+                <li>{{payment_method.last4}}</li>
+                <li>{{payment_method.payment_type}}</li>
+                <li>{{payment_method.exp_month}}</li>
+                <li>{{payment_method.exp_year}}</li>
+            </ul>
+        </li>
+    {% endfor %}
+</ol>
+{% endblock %}

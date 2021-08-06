@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+<h1>Payment method create</h1>
+
+<p>{{request.user.account}}</p>
+<p>{{csrf_token}}</p>
+
+<div style="width: 400px;">
+    <label for="card-element">Card</label>
+    <div id="card-element"></div>
+    <button onclick="submitStripe()">Submit</button>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://js.stripe.com/v3/"></script>
+
+<script>
+const stripe = Stripe('pk_test_80gcLEXchuHMqlle2ALuqJmA');
+var elements = stripe.elements();
+var cardElement = elements.create('card');
+cardElement.mount('#card-element');
+
+console.log('{{csrf_token}}');
+
+function submitStripe() {
+    console.log('submitStripe');
+    console.log(cardElement);
+    stripe.createPaymentMethod({
+        type: 'card',
+        card: cardElement,
+        billing_details: {
+            name: 'Chuck Testa',
+        },
+    })
+    .then(function(result) {
+        console.log(result);
+        if (result.error) {
+            conosle.log('Some error');
+            console.log(error);
+        } else if (result.paymentMethod) {
+            console.log('Good -- got a paymentMethod');
+            console.log(result.paymentMethod);
+
+            var name = 'Test card 1'
+            var account = '{{request.user.account.id}}';
+            var pm = result.paymentMethod;
+
+            var data = {
+                name: name,
+                account: account,
+                pm: pm,
+            };
+
+            createPaymentMethod(data);
+            
+        } else {
+            console.log('Some other unexpected result');
+        }
+    });
+}
+
+function createPaymentMethod(data) {
+    console.log('createPaymentMethod');
+    console.log('{{csrf_token}}');
+
+    var headers = {
+        'X-CSRFToken': '{{csrf_token}}',
+    };
+
+    fetch('.', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(data),
+    }).then(response => {
+        console.log('Response:', response);
+    });
+    
+}
+</script>
+{% endblock %}

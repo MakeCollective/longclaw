@@ -28,6 +28,9 @@ urls_no_prefix = [
     # path('email_verification/', views.AccountEmailVerificationView, name='account_email_verification'),
     # path('email_verification_confirm/', views.AccountEmailVerificationConfirmView, name='account_email_verification_confirm'),
     # path('remove_all_users/', views.remove_all_users, name='remove_all_users'),
+
+    path('payment-methods/', views.PaymentMethodIndexView.as_view(), name='payment_methods_index'),
+    path('payment-methods/create/', views.PaymentMethodCreateView.as_view(), name='payment_method_create'),
 ]
 
 urlpatterns = [

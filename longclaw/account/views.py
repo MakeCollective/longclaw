@@ -5,14 +5,19 @@ from django.contrib.auth import get_user_model, login
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView, View
 
+from longclaw.account.models import StripePaymentMethod
 from longclaw.account.forms import (
     AccountForm, SignupForm, LoginForm
 )
 from longclaw.shipping.forms import AddressForm
 
+import json
+
 UserModel = get_user_model()
+
 
 def remove_all_users(request):
     ''' Delete all existing all users except my one, only for testing '''
@@ -298,3 +303,71 @@ class PasswordResetCompleteView(auth_views.PasswordResetCompleteView):
     template_name = 'longclaw/account/password/password_reset_complete.html'
 
 
+
+
+   
+class PaymentMethodIndexView(LoginRequiredMixin, TemplateView):
+    ''' Index view for all existing Payment Methods ("cards") for the current account '''
+    login_view = reverse_lazy('login')
+    template_name = 'longclaw/account/payment_methods_index.html'
+
+    def get_context_data(self, request):
+        context = {
+            'payment_methods': StripePaymentMethod.objects.filter(account=request.user.account)
+        }
+        return context
+
+    def get(self, request):
+        context = self.get_context_data(request)
+        return render(request, self.template_name, context=context)
+    
+    def post(self, request):
+        context = self.get_context_data(request)
+        return render(request, self.template_name, context=context)
+
+
+class PaymentMethodCreateView(LoginRequiredMixin, TemplateView):
+    ''' Contains the form to create a new Payment Method for the current account '''
+    login_view = reverse_lazy('login')
+    template_name = 'longclaw/account/payment_method_create.html'
+
+    def get_context_data(self, request):
+        context = {}
+        return context
+
+    def get(self, request):
+        context = self.get_context_data(request)
+        return render(request, self.template_name, context=context)
+    
+    def post(self, request):
+        context = self.get_context_data(request)
+
+        data = json.loads(request.body)
+        account = request.user.account
+        create_stripe_payment_method(data['pm'], account, data['name'])
+        
+        return render(request, self.template_name, context=context)
+
+
+def create_stripe_payment_method(pm, account, name):
+    stripe_id = pm.get('id')
+    if not stripe_id:
+        return None
+
+    card = pm.get('card')
+
+    try:
+        pm = StripePaymentMethod.objects.get(stripe_id=stripe_id)
+    except StripePaymentMethod.DoesNotExist:
+        pm = StripePaymentMethod.objects.create(
+            account=account,
+            name=name,
+            stripe_id=stripe_id,
+            last4=card.get('last4'),
+            payment_type=pm.get('type'),
+            exp_month=card.get('exp_month'),
+            exp_year=card.get('exp_year'),
+        )
+    
+    return pm
+        
