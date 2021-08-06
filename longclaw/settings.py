@@ -37,6 +37,3 @@ BRAINTREE_PRIVATE_KEY = getattr(settings, 'BRAINTREE_PRIVATE_KEY', '')
 VZERO_ACCESS_TOKEN = getattr(settings, 'VZERO_ACCESS_TOKEN', '')
 
 API_URL_PREFIX = getattr(settings, 'LONGCLAW_API_URL_PREFIX', 'api/')
-
-STRIPE_PUBLIC_KEY = getattr(settings, 'STRIBE_PUBLIC_KEY', '')
-STRIPE_SECRET_KEY = getattr(settings, 'STRIPE_SECRET_KEY', '')
