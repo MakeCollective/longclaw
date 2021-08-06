@@ -55,7 +55,7 @@ INSTALLED_APPS = [
     'longclaw.basket',
     'longclaw.stats',
     'longclaw.coupon',
-    'longclaw.customer',
+    'longclaw.account',
     'longclaw.contrib.productrequests',
     'longclaw.tests.testproducts',
     'longclaw.tests.trivialrates',
