@@ -1,6 +1,6 @@
 import math
 import stripe
-from longclaw.settings import STRIPE_SECRET
+from longclaw.settings import STRIPE_SECRET_KEY
 from longclaw.configuration.models import Configuration
 from longclaw.checkout.errors import PaymentError
 from longclaw.checkout.gateways import BasePayment
@@ -11,7 +11,7 @@ class StripePayment(BasePayment):
     Create a payment using stripe
     """
     def __init__(self):
-        stripe.api_key = STRIPE_SECRET
+        stripe.api_key = STRIPE_SECRET_KEY
 
     def create_payment(self, request, amount, description='', metadata={}):
         try:

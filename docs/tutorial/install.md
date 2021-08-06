@@ -70,7 +70,7 @@ Change the entry for `PAYMENT_GATEWAY` from `'longclaw.checkout.gateways.BasePay
 To use Stripe we will need to inform longclaw of our access tokens. To do this, add the following setting:
 
 ```python
-STRIPE_SECRET = 'sk_live_xxx'
+STRIPE_SECRET_KEY = 'sk_live_xxx'
 ```
 Where `sk_live_xxx` is your stripe secret key, accessable from the stripe dashboard, under `Developers -> API Keys`.
 
@@ -81,7 +81,7 @@ Note that if you are storing your website code in a public repository, or otherw
 Instead, use an environment variable:
 
 ```python
-STRIPE_SECRET = os.environ.get('STRIPE_SECRET', '')
+STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY', '')
 ```
 
 ## Migration

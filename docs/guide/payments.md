@@ -20,8 +20,8 @@ The options are:
 To use payment gateways it is necessary to specify API keys and install client SDK's for the chosen payment provider.
 
 ## Stripe
-  `STRIPE_PUBLISHABLE` - Your public api key
-  `STRIPE_SECRET` - Your secret api key
+  `STRIPE_PUBLIC_KEY` - Your public api key
+  `STRIPE_SECRET_KEY` - Your secret api key
   You will need to install the stripe python sdk (`pip install stripe`)
 
 ## Braintree

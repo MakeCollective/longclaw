@@ -77,9 +77,9 @@ class StripePaymentMethod(PaymentMethod):
         except Exception as e:
             raise e
 
-        stripe.api_key = settings.STRIPE_SECRET
+        stripe.api_key = settings.STRIPE_SECRET_KEY
         if not stripe.api_key:
-            raise ValueError('STRIPE_SECRET has not been provided')
+            raise ValueError('STRIPE_SECRET_KEY has not been provided')
         
         try:
             pm = stripe.PaymentMethod.retrieve(self.stripe_id)
