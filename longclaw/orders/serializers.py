@@ -25,6 +25,7 @@ class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True)
     shipping_address = AddressSerializer()
     total = serializers.SerializerMethodField()
+    order_count = serializers.ReadOnlyField()
 
     def to_representation(self, value):
         rep = super().to_representation(value)
@@ -34,7 +35,7 @@ class OrderSerializer(serializers.ModelSerializer):
             rep['discount_value'] = discount.coupon.discount_string(discount.coupon.discount_value)
         except Discount.DoesNotExist:
             pass
-            
+        
         return rep
 
     class Meta:

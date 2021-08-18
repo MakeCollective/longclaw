@@ -75,6 +75,12 @@ class Order(models.Model):
         """The number of individual items on the order
         """
         return self.items.count()
+    
+    @property
+    def order_count(self):
+        """ The count of orders made by someone with the same email address
+        """
+        return Order.objects.filter(email=self.email).count()
 
 
     def refund(self):
