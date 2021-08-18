@@ -40,6 +40,17 @@ class Account(models.Model):
     def email(self):
         return self.user.email
 
+    @property
+    def stripe_active_payment_method(self):
+        if not self.active_payment_method:
+            return None
+        try:
+            pm = StripePaymentMethod.objects.get(id=self.active_payment_method.id)
+        except StripePaymentMethod.DoesNotExist as e:
+            raise e
+        else:
+            return pm
+
     # Related fields
     # AccountPaymentMethod(s)
     # Future proofing in case an Account will have multiple payment methods (cards)
@@ -50,14 +61,35 @@ class PaymentMethod(models.Model):
     Hold details about an Account's (potentially) multiple payment methods (cards)
     Must be attached to an Account. If the attached Account is deleted, so are it's related PaymentMethods
     '''
+    ACTIVE = 1
+    DEACTIVATED = 2
+    INVALID = 3
+    EXPIRED = 4
+    STATUSES = (
+        (ACTIVE, 'Active'),
+        (DEACTIVATED, 'Deactivate'),
+        (INVALID, 'Invalid'),
+        (EXPIRED, 'Expired'),
+    )
+    
     account = models.ForeignKey('account.Account', related_name='payment_methods', on_delete=models.CASCADE)
-    name = models.CharField(max_length=255, help_text='User friendly name for the payment method')
+    label = models.CharField(max_length=255, help_text='User friendly label for the payment method')
+    status = models.IntegerField(default=ACTIVE, choices=STATUSES, help_text='Status to show if the PaymentMethod is active/deactive or otherwise')
     
     def __str__(self):
-        return f'{self.name}'
+        return f'{self.label}'
 
     def check_valid(self):
         raise NotImplementedError
+
+    @property
+    def is_active_payment_method(self):
+        return self.id == self.account.active_payment_method.id
+
+    def deactivate(self):
+        self.status = self.DEACTIVATED
+        self.save()
+        return self
     
 
 class StripePaymentMethod(PaymentMethod):

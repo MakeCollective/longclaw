@@ -1,0 +1,84 @@
+{% extends 'longclaw/account/account_base.html' %}
+
+{% block content %}
+<h1>Singular payment method</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>Field</th>
+            <th>Data</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>account</td>
+            <td>{{payment_method.account}}</td>
+        </tr>
+        <tr>    
+            <td>label</td>
+            <td>{{payment_method.label}}</td>
+        </tr>
+        <tr>    
+            <td>stripe_id</td>
+            <td>{{payment_method.stripe_id}}</td>
+        </tr>
+        <tr>    
+            <td>last4</td>
+            <td>{{payment_method.last4}}</td>
+        </tr>
+        <tr>    
+            <td>payment_type</td>
+            <td>{{payment_method.payment_type}}</td>
+        </tr>
+        <tr>    
+            <td>exp_month</td>
+            <td>{{payment_method.exp_month}}</td>
+        </tr>
+        <tr>    
+            <td>exp_year</td>
+            <td>{{payment_method.exp_year}}</td>
+        </tr>
+        <tr>
+            <td>Default payment method</td>
+            <td id="is-active-payment-method">{{payment_method.is_active_payment_method}}</td>
+        </tr>
+        <tr>
+            <td>Status</td>
+            <td>{{payment_method.get_status_display}}</td>
+        </tr>
+    </tbody>
+</table>
+
+<p><a href="{% url 'payment_method_set_default' pm_id=payment_method.id %}" onclick="ajaxRequest(event)">Set this as default payment method</a></p>
+<p><a href="{% url 'payment_method_deactivate' pm_id=payment_method.id %}" onclick="ajaxRequest(event)">Deactivate this payment method</a></p>
+
+<p><a href="{% url 'payment_methods_index' %}">Payment methods index</a></p>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+
+function ajaxRequest(e) {
+    e.preventDefault();
+    var url = e.target.href;
+
+    var headers = {
+        'X-CSRFToken': '{{csrf_token}}',
+    };
+
+    fetch(url, {
+        method: 'GET',
+        {% comment %} headers: headers, {% endcomment %}
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('is-active-payment-method').innerHTML = 'True';
+            }
+    });
+}
+
+</script>
+{% endblock%}

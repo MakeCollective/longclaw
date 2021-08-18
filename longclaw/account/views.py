@@ -1,6 +1,7 @@
 from django.urls import reverse, reverse_lazy
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
+from django.conf import settings
 from django.contrib.auth import get_user_model, login
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
@@ -8,13 +9,16 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView, View
 
-from longclaw.account.models import StripePaymentMethod
+from longclaw.account.models import Account, StripePaymentMethod
 from longclaw.account.forms import (
-    AccountForm, SignupForm, LoginForm
+    AccountForm, SignupForm, LoginForm,
+    StripePaymentMethodForm,
 )
 from longclaw.shipping.forms import AddressForm
+from longclaw.account.utils import create_stripe_payment_method
 
 import json
+import stripe
 
 UserModel = get_user_model()
 
@@ -58,6 +62,7 @@ class SignupView(View):
             'shipping_address_form': self.address_form(prefix='shipping_address'),
             'billing_address_form': self.address_form(prefix='billing_address', use_required_attribute=False),
             'shipping_billing_address_same': True,
+            'stripe_public_key': settings.STRIPE_PUBLIC_KEY,
         }
         return context
 
@@ -308,12 +313,19 @@ class PasswordResetCompleteView(auth_views.PasswordResetCompleteView):
    
 class PaymentMethodIndexView(LoginRequiredMixin, TemplateView):
     ''' Index view for all existing Payment Methods ("cards") for the current account '''
-    login_view = reverse_lazy('login')
+    login_url = reverse_lazy('login')
     template_name = 'longclaw/account/payment_methods_index.html'
 
     def get_context_data(self, request):
+        active_payment_method = request.user.account.stripe_active_payment_method
+        if active_payment_method:
+            payment_methods = StripePaymentMethod.objects.filter(account=request.user.account).exclude(id=active_payment_method.id)
+        else:
+            payment_methods = StripePaymentMethod.objects.filter(account=request.user.account)
+
         context = {
-            'payment_methods': StripePaymentMethod.objects.filter(account=request.user.account)
+            'active_payment_method': active_payment_method,
+            'payment_methods': payment_methods,
         }
         return context
 
@@ -326,48 +338,176 @@ class PaymentMethodIndexView(LoginRequiredMixin, TemplateView):
         return render(request, self.template_name, context=context)
 
 
+class PaymentMethodView(LoginRequiredMixin, TemplateView):
+    ''' '''
+    login_url = reverse_lazy('login')
+    template_name = 'longclaw/account/payment_method.html'
+
+    def get_context_data(self, request):
+        payment_method = StripePaymentMethod.objects.filter(id=self.kwargs['pm_id']).first()
+        context = {
+            'payment_method': payment_method,
+        }
+        return context
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data(request)
+
+        if not context['payment_method']:
+            return redirect(reverse('payment_methods_index'))
+
+        return render(request, self.template_name, context=context)
+
+
 class PaymentMethodCreateView(LoginRequiredMixin, TemplateView):
     ''' Contains the form to create a new Payment Method for the current account '''
-    login_view = reverse_lazy('login')
+    login_url = reverse_lazy('login')
     template_name = 'longclaw/account/payment_method_create.html'
 
     def get_context_data(self, request):
-        context = {}
+        stripe_payment_method_form = StripePaymentMethodForm(request.POST)
+        context = {
+            'stripe_public_key': settings.STRIPE_PUBLIC_KEY,
+            'stripe_payment_method_form': stripe_payment_method_form,
+        }
         return context
 
     def get(self, request):
         context = self.get_context_data(request)
+
+        context['stripe_payment_method_form'] = StripePaymentMethodForm(initial={
+            'number': '4242424242424242',
+            'expiry_month': 5,
+            'expiry_year': 27,
+            'cvc': 123,
+        })
+        
         return render(request, self.template_name, context=context)
     
     def post(self, request):
         context = self.get_context_data(request)
 
-        data = json.loads(request.body)
         account = request.user.account
-        create_stripe_payment_method(data['pm'], account, data['name'])
+
+        stripe_payment_method_form = StripePaymentMethodForm(request.POST)
+        if stripe_payment_method_form.is_valid():
+            payment_method = stripe_payment_method_form.save(commit=False)
+            payment_method.account = account
+            payment_method.save()
+
+            # If no payment method is default for an account yet, make this one the default
+            if not account.active_payment_method:
+                account.active_payment_method = payment_method
+                
+            return redirect(reverse('payment_method_create_success'))
+        else:
+            print('@'*80)
+            print('Payment method form was not valid')
+            print(stripe_payment_method_form.errors)
+            print('@'*80)
         
         return render(request, self.template_name, context=context)
 
 
-def create_stripe_payment_method(pm, account, name):
-    stripe_id = pm.get('id')
-    if not stripe_id:
-        return None
+class PaymentMethodCreateSuccessView(LoginRequiredMixin, TemplateView):
+    login_url = reverse_lazy('login')
+    template_name = 'longclaw/account/payment_method_create_success.html'
 
-    card = pm.get('card')
+    def get(self, request):
+        return render(request, self.template_name, context={})
 
-    try:
-        pm = StripePaymentMethod.objects.get(stripe_id=stripe_id)
-    except StripePaymentMethod.DoesNotExist:
-        pm = StripePaymentMethod.objects.create(
-            account=account,
-            name=name,
-            stripe_id=stripe_id,
-            last4=card.get('last4'),
-            payment_type=pm.get('type'),
-            exp_month=card.get('exp_month'),
-            exp_year=card.get('exp_year'),
-        )
+
+def add_payment_method_to_stripe_user(account, pm):
+    stripe.api_key = settings.STRIPE_SECRET_KEY
     
-    return pm
-        
+    print('*'*80)
+    print(account)
+    print(account.stripe_customer_id)
+    print(pm.stripe_id)
+    print('*'*80)
+
+    response = stripe.PaymentMethod.attach(
+        pm.stripe_id,
+        customer=account.stripe_customer_id,
+    )
+
+    return response
+
+
+def create_stripe_customer(account):
+    ''' 
+    Send a request to Stripe to create a Customer
+    '''    
+    data = {
+        'address': None,
+        'description': None,
+        'email': account.email,
+        'metadata': None,
+        'name': account.user.get_full_name(),
+        'payment_method': None, # Attach it after
+        'phone': account.phone,
+        'shipping': None,
+    }
+    
+    if account.billing_address:
+        data['address'] = {
+            'city': account.billing_address.city,
+            'country': 'NZ',
+            'line1': account.billing_address.line_1,
+            'line2': account.billing_address.line_2,
+            'postal_code': account.billing_address.postcode,
+        }
+    
+    if account.shipping_address:
+        data['shipping'] = {
+            'address': {
+                'city': account.shipping_address.city,
+                'country': 'NZ',
+                'line1': account.shipping_address.line_1,
+                'line2': account.shipping_address.line_2,
+                'postal_code': account.shipping_address.postcode,
+            },
+            'name': account.user.get_full_name(),
+            'phone': account.phone,
+        }
+    
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+
+    customer = stripe.Customer.create(
+        address=data['address'],
+        description=data['description'],
+        email=data['email'],
+        metadata=data['metadata'],
+        name=data['name'],
+        phone=data['phone'],
+        shipping=data['shipping'],
+    )
+    return customer
+
+
+
+
+def test_stripe():
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+
+    a = stripe.PaymentMethod.create(
+        type='card',
+        card={
+            'number': '4242424242424242',
+            'exp_month': 4,
+            'exp_year': 2020,
+            'cvc': '409',
+        }
+    )
+
+    b = Account.objects.first()
+
+    c = stripe.PaymentMethod.attach(
+        a.id,
+        customer=b.stripe_customer_id,
+    )
+
+    # print(a)
+    print(c)
+
+# test_stripe()

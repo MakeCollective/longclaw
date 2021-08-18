@@ -1,9 +1,12 @@
 from django.urls import path
 from django.conf.urls import url, include
 
+from longclaw.settings import API_URL_PREFIX
 from longclaw.account import views
+from longclaw.account import api
 
 PREFIX = 'account/'
+API_PREFIX = API_URL_PREFIX + 'account/'
 
 urls_no_prefix = [
     path('', views.LandingView.as_view(), name='account_landing'),
@@ -30,9 +33,18 @@ urls_no_prefix = [
     # path('remove_all_users/', views.remove_all_users, name='remove_all_users'),
 
     path('payment-methods/', views.PaymentMethodIndexView.as_view(), name='payment_methods_index'),
+    path('payment-methods/<int:pm_id>/', views.PaymentMethodView.as_view(), name='payment_method'),
     path('payment-methods/create/', views.PaymentMethodCreateView.as_view(), name='payment_method_create'),
+    path('payment-methods/create/success/', views.PaymentMethodCreateSuccessView.as_view(), name='payment_method_create_success'),
+]
+
+api_urls_no_prefix = [
+    path('payment-methods/<int:pm_id>/set-default/', api.payment_method_set_default, name='payment_method_set_default'),
+    path('payment-methods/<int:pm_id>/delete/', api.payment_method_deactivate, name='payment_method_deactivate'),
+
 ]
 
 urlpatterns = [
-    path(PREFIX, include(urls_no_prefix))
+    path(PREFIX, include(urls_no_prefix)),
+    path(API_PREFIX, include(api_urls_no_prefix)),
 ]
