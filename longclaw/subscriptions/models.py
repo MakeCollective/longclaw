@@ -36,13 +36,13 @@ class Subscription(models.Model):
     # repeat_weekly = models.BooleanField(default=False)
     # repeat_monthly = models.BooleanField(default=False)
     # repeat_period = models.IntegerField(blank=True, null=True, help_text='The amount of days until the order is to be repeated')
-    dispatch_frequency = models.IntegerField(default=1, help_text='The frequency of subscriptions being fulfilled, in weeks')
+    dispatch_frequency = models.IntegerField(default=1, help_text='The frequency of the order being fulfilled, in weeks')
     dispatch_day_of_week = models.IntegerField(choices=WEEKDAYS, default=MONDAY)
     one_click_reminder = models.BooleanField(default=False, help_text='Whether or not to require a customer confirmation before dispatching the order')
     active = models.BooleanField(default=False, help_text='Whether or not this subscription should be dispatched as normal')
     shipping_address = models.ForeignKey('shipping.Address', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
     billing_address = models.ForeignKey('shipping.Address', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
-    selected_payment_method = models.ForeignKey('account.AccountPaymentMethod', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
+    selected_payment_method = models.ForeignKey('account.StripePaymentMethod', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
 
     @property
     def payment_method(self):
