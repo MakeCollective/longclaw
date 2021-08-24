@@ -41,7 +41,7 @@ class Subscription(models.Model):
     active = models.BooleanField(default=False, help_text='Whether or not this subscription should be dispatched as normal')
     shipping_address = models.ForeignKey('shipping.Address', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
     billing_address = models.ForeignKey('shipping.Address', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
-    selected_payment_method = models.ForeignKey('account.PaymentMethod', related_name='subscriptions', on_delete=models.SET_NULL, blank=True, null=True)
+    selected_payment_method = models.ForeignKey('account.AccountPaymentMethod', related_name='subscriptions', on_delete=models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
         return f'{self.id} - {self.account}'
