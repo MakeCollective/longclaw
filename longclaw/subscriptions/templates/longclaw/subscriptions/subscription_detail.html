@@ -1,0 +1,83 @@
+{% extends "longclaw/account/account_base.html" %}
+
+{% block content %}
+
+<h1>Subscription detail</h1>
+
+<p><a href="{% url 'subscriptions_index' %}">Subscription Index</a></p>
+
+<table>
+    <thead>
+        <tr>
+            <td>Data</td>
+            <td>Value</td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>account</td>
+            <td>{{subscription.account}}</td>
+        </tr>
+        <tr>
+            <td>created</td>
+            <td>{{subscription.created}}</td>
+        </tr>
+        <tr>
+            <td>last_modified</td>
+            <td>{{subscription.last_modified}}</td>
+        </tr>
+        <tr>
+            <td>last_dispatch</td>
+            <td>{{subscription.last_dispatch}}</td>
+        </tr>
+        <tr>
+            <td>next_dispatch</td>
+            <td>{{subscription.next_dispatch}}</td>
+        </tr>
+        <tr>
+            <td>repeat_weekly</td>
+            <td>{{subscription.repeat_weekly}}</td>
+        </tr>
+        <tr>
+            <td>repeat_monthly</td>
+            <td>{{subscription.repeat_monthly}}</td>
+        </tr>
+        <tr>
+            <td>day_of_week</td>
+            <td>{{subscription.day_of_week}}</td>
+        </tr>
+        <tr>
+            <td>day_of_week display</td>
+            <td>{{subscription.get_day_of_week_display}}</td>
+        </tr>
+        <tr>
+            <td>repeat_period</td>
+            <td>{{subscription.repeat_period}}</td>
+        </tr>
+        <tr>
+            <td>repeat_period</td>
+            <td>{{subscription.repeat_period}}</td>
+        </tr>
+        <tr>
+            <td>one_click_reminder</td>
+            <td>{{subscription.one_click_reminder}}</td>
+        </tr>
+        <tr>
+            <td>active</td>
+            <td>{{subscription.active}}</td>
+        </tr>
+        <tr>
+            <td>shipping_address</td>
+            <td>{{subscription.shipping_address}}</td>
+        </tr>
+        <tr>
+            <td>billing_address</td>
+            <td>{{subscription.billing_address}}</td>
+        </tr>
+    </tbody>
+</table>
+
+
+{% include "longclaw/account/account_nav.html" %}
+
+{% endblock content %}

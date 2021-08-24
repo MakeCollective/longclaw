@@ -7,6 +7,7 @@ PREFIX = 'account/subscriptions/'
 
 urls_no_prefix = [
     path('', views.SubscriptionIndexView.as_view(), name='subscriptions_index'),
+    path('<int:subscription_id>/', views.SubscriptionDetailView.as_view(), name='subscription_detail'),
     path('create/', views.SubscriptionCreateView.as_view(), name='subscription_create'),
     path('create/success/', views.SubscriptionCreateSuccessView.as_view(), name='subscription_create_success'),
     path('test-add-to-basket/', views.test_add_to_basket, name='test_add_to_basket'),

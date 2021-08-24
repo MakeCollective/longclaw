@@ -47,6 +47,24 @@ class SubscriptionIndexView(LoginRequiredMixin, View):
 
         return render(request, self.template_name, context=context)
 
+
+class SubscriptionDetailView(LoginRequiredMixin, View):
+    login_view = reverse_lazy('login')
+    template_name = 'longclaw/subscriptions/subscription_detail.html'
+
+    def get(self, request, subscription_id):
+        account = request.user.account
+        try:
+            subscription = account.subscriptions.get(id=subscription_id)
+        except account.subscription.DoesNotExist as e:
+            print('No subscriptipn for this account exists')
+            subscription = None
+        
+        context = {
+            'subscription': subscription,
+        }
+        return render(request, self.template_name, context=context)
+
     
 class SubscriptionCreateView(LoginRequiredMixin, TemplateView):
     login_view = reverse_lazy('login')
