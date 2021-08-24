@@ -12,6 +12,11 @@
     {% endfor %}
 </ul> {% endcomment %}
 
+<form action="">
+    {{subscription_form.as_p}}
+</form>
+
+
 <form action="." method="post">
     {% csrf_token %}
     <table>

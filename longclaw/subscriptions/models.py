@@ -33,15 +33,26 @@ class Subscription(models.Model):
     last_modified = models.DateTimeField(auto_now=True)
     last_dispatch = models.DateTimeField(blank=True, null=True)
     next_dispatch = models.DateTimeField(blank=True, null=True)
-    repeat_weekly = models.BooleanField(default=False)
-    repeat_monthly = models.BooleanField(default=False)
-    repeat_period = models.IntegerField(blank=True, null=True, help_text='The amount of days until the order is to be repeated')
-    day_of_week = models.CharField(max_length=20, choices=WEEKDAYS, default=MONDAY)
+    # repeat_weekly = models.BooleanField(default=False)
+    # repeat_monthly = models.BooleanField(default=False)
+    # repeat_period = models.IntegerField(blank=True, null=True, help_text='The amount of days until the order is to be repeated')
+    dispatch_frequency = models.IntegerField(default=1, help_text='The frequency of subscriptions being fulfilled, in weeks')
+    dispatch_day_of_week = models.IntegerField(choices=WEEKDAYS, default=MONDAY)
     one_click_reminder = models.BooleanField(default=False, help_text='Whether or not to require a customer confirmation before dispatching the order')
     active = models.BooleanField(default=False, help_text='Whether or not this subscription should be dispatched as normal')
     shipping_address = models.ForeignKey('shipping.Address', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
     billing_address = models.ForeignKey('shipping.Address', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
-    selected_payment_method = models.ForeignKey('account.AccountPaymentMethod', related_name='subscriptions', on_delete=models.SET_NULL, blank=True, null=True)
+    selected_payment_method = models.ForeignKey('account.AccountPaymentMethod', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
+
+    @property
+    def payment_method(self):
+        if self.selected_payment_method:
+            return self.selected_payment_method
+        elif self.account and self.account.active_payment_method:
+            return self.account.active_payment_method
+        else:
+            return None
+    
 
     def __str__(self):
         return f'{self.id} - {self.account}'
@@ -61,9 +72,9 @@ class Subscription(models.Model):
         self.next_dispatch = date
         self.save()
     
-    def update_repeat_period(self, period):
-        self.repeat_period = period
-        self.save()
+    # def update_repeat_period(self, period):
+    #     self.repeat_period = period
+    #     self.save()
 
     def get_shipping_address(self):
         if not self.shipping_address:

@@ -9,6 +9,7 @@ from longclaw.basket.models import BasketItem
 from longclaw.configuration.models import Configuration
 from longclaw.subscriptions.models import Subscription
 from longclaw.subscriptions.utils import create_subscription_order
+from longclaw.subscriptions.forms import SubscriptionForm
 from longclaw.orders.models import Order
 from longclaw.shipping.forms import AddressForm
 
@@ -92,6 +93,8 @@ class SubscriptionCreateView(LoginRequiredMixin, TemplateView):
         context = self.get_context(request)
         
         basket, bid = get_basket_items(request)
+
+        subscription_form = SubscriptionForm
         
         # Get address form(s)
         shipping_address_form = AddressForm(prefix='shipping_address', instance=context.get('shipping_address'), use_required_attribute=False)
@@ -104,6 +107,7 @@ class SubscriptionCreateView(LoginRequiredMixin, TemplateView):
             'billing_address_form': billing_address_form,
             'default_addresses': True,
             'shipping_billing_address_same': True,
+            'subscription_form': subscription_form,
         })
 
         return render(request, self.template_name, context=context)
