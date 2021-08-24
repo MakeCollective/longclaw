@@ -17,7 +17,7 @@ class Account(models.Model):
     billing_address = models.ForeignKey('shipping.Address', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
     shipping_billing_address_same = models.BooleanField(default=True)
     stripe_customer_id = models.CharField(max_length=255, blank=True, null=True)
-    active_payment_method = models.ForeignKey('account.AccountPaymentMethod', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
+    active_payment_method = models.OneToOneField('account.PaymentMethod', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
         string = f'({self.id}) '
@@ -40,22 +40,68 @@ class Account(models.Model):
     def email(self):
         return self.user.email
 
+    @property
+    def stripe_active_payment_method(self):
+        if not self.active_payment_method:
+            return None
+        try:
+            pm = StripePaymentMethod.objects.get(id=self.active_payment_method.id)
+        except StripePaymentMethod.DoesNotExist as e:
+            raise e
+        else:
+            return pm
+
     # Related fields
     # AccountPaymentMethod(s)
     # Future proofing in case an Account will have multiple payment methods (cards)
 
 
-class AccountPaymentMethod(models.Model):
+class PaymentMethod(models.Model):
     '''
     Hold details about an Account's (potentially) multiple payment methods (cards)
     Must be attached to an Account. If the attached Account is deleted, so are it's related PaymentMethods
     '''
+    ACTIVE = 1
+    DEACTIVATED = 2
+    INVALID = 3
+    EXPIRED = 4
+    STATUSES = (
+        (ACTIVE, 'Active'),
+        (DEACTIVATED, 'Deactivate'),
+        (INVALID, 'Invalid'),
+        (EXPIRED, 'Expired'),
+    )
+    
     account = models.ForeignKey('account.Account', related_name='payment_methods', on_delete=models.CASCADE)
-    name = models.CharField(max_length=255, help_text='User friendly name for the payment method')
-    stripe_id = models.CharField(max_length=255)
-
+    label = models.CharField(max_length=255, help_text='User friendly label for the payment method')
+    status = models.IntegerField(default=ACTIVE, choices=STATUSES, help_text='Status to show if the PaymentMethod is active/deactive or otherwise')
+    
     def __str__(self):
-        return f'{self.name}'
+        return f'{self.label}'
+
+    def check_valid(self):
+        raise NotImplementedError
+
+    @property
+    def is_active_payment_method(self):
+        return self.id == self.account.active_payment_method.id
+
+    def deactivate(self):
+        self.status = self.DEACTIVATED
+        self.save()
+        return self
+    
+
+class StripePaymentMethod(PaymentMethod):
+    '''
+    A subclass of the PaymentMethod
+    Holds Stripe specific fields
+    '''
+    stripe_id = models.CharField(max_length=255)
+    last4 = models.CharField(max_length=255)
+    payment_type = models.CharField(max_length=255, help_text='Will most likely be "card"')
+    exp_month = models.CharField(max_length=255)
+    exp_year = models.CharField(max_length=255)
 
     def check_valid(self):
         try:
@@ -63,9 +109,9 @@ class AccountPaymentMethod(models.Model):
         except Exception as e:
             raise e
 
-        stripe.api_key = settings.STRIPE_SECRET
+        stripe.api_key = settings.STRIPE_SECRET_KEY
         if not stripe.api_key:
-            raise ValueError('STRIPE_SECRET has not been provided')
+            raise ValueError('STRIPE_SECRET_KEY has not been provided')
         
         try:
             pm = stripe.PaymentMethod.retrieve(self.stripe_id)
@@ -73,4 +119,3 @@ class AccountPaymentMethod(models.Model):
             raise e
 
         return True
-    

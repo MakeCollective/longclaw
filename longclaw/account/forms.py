@@ -5,8 +5,11 @@ from django.contrib.auth import get_user_model, password_validation
 from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm
 from django.utils.translation import gettext, gettext_lazy as _
 
-from longclaw.account.models import Account
+from longclaw.account.models import Account, StripePaymentMethod
 from longclaw.shipping.forms import AddressForm
+from longclaw.account.utils import create_stripe_payment_method
+
+import stripe
 
 UserModel = get_user_model()
 
@@ -146,3 +149,51 @@ class LoginForm(AuthenticationForm):
         
         return super().clean(*args, **kwargs)
 
+
+class PaymentMethodForm(forms.Form):
+    label = forms.CharField(label='Label')
+    number = forms.CharField(label='Card number')
+    expiry_month = forms.CharField(
+        label='Expiry month',
+    )
+    expiry_year = forms.CharField(
+        label='Expiry year',
+    )
+    cvc = forms.CharField(
+        label='CVC',
+    )
+
+
+class StripePaymentMethodForm(PaymentMethodForm):
+
+    def save(self, commit=True):
+        cleaned_data = self.cleaned_data
+        
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+
+        # Try to create the stripe StripePaymentMethod here
+        try:
+            pm = create_stripe_payment_method(
+                cleaned_data.get('number'),
+                cleaned_data.get('expiry_month'),
+                cleaned_data.get('expiry_year'),
+                cleaned_data.get('cvc')
+            )
+        except stripe.error.CardError as e:
+            self.add_error(field=None, error=e)
+        except Exception as e:
+            print('!'*80)
+            print('Some other exception while saving PaymentMethod:', e)
+            print('!'*80)
+        else:
+            # Create the longclaw StripePaymentMethod and attach to account
+            card = pm.get('card')
+            payment_method = StripePaymentMethod(
+                label=self.cleaned_data.get('label'),
+                stripe_id=pm.get('id'),
+                last4=card.get('last4'),
+                payment_type=pm.get('type'),
+                exp_month=card.get('exp_month'),
+                exp_year=card.get('exp_year'),
+            )
+            return payment_method

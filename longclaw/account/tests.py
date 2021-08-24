@@ -98,11 +98,11 @@ class MissingStripeSecretTestCase(TestCase):
         )
 
     def test_missing_stripe_key(self):
-        del settings.STRIPE_SECRET
+        del settings.STRIPE_SECRET_KEY
         self.assertRaises(AttributeError, self.account_payment_method.check_valid)
 
     def test_empty_stripe_key(self):
-        settings.STRIPE_SECRET = ''
+        settings.STRIPE_SECRET_KEY = ''
         self.assertRaises(ValueError, self.account_payment_method.check_valid)
 
 

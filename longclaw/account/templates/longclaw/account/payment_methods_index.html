@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Payment methods index</h1>
+
+<p><a href="{% url 'payment_method_create' %}">Create payment method</a></p>
+
+{% if active_payment_method %}
+<p>
+    <h2>Active payment method</h2>
+    <ul>
+        <li>{{active_payment_method.label}} -- <a href="{% url 'payment_method' pm_id=active_payment_method.id %}">Details</a></li>
+        {% comment %} <li>{{active_payment_method.account}}</li>
+        <li>{{active_payment_method.label}}</li>
+        <li>{{active_payment_method.stripe_id}}</li>
+        <li>{{active_payment_method.last4}}</li>
+        <li>{{active_payment_method.payment_type}}</li>
+        <li>{{active_payment_method.exp_month}}</li>
+        <li>{{active_payment_method.exp_year}}</li> {% endcomment %}
+    </ul>
+</p>
+{% endif %}
+
+<p>
+    <h2>Other payment methods</h2>
+    <ul>
+        {% for payment_method in payment_methods %}
+            <li>{{payment_method.label}} -- <a href="{% url 'payment_method' pm_id=payment_method.id %}">Details</a></li>
+            {% comment %} <li>{{payment_method.account}}</li>
+            <li>{{payment_method.label}}</li>
+            <li>{{payment_method.stripe_id}}</li>
+            <li>{{payment_method.last4}}</li>
+            <li>{{payment_method.payment_type}}</li>
+            <li>{{payment_method.exp_month}}</li>
+            <li>{{payment_method.exp_year}}</li> {% endcomment %}
+        {% endfor %}
+    </ul>
+</p>
+{% endblock %}
