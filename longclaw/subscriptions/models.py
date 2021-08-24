@@ -3,22 +3,45 @@ from django.conf import settings
 
 from wagtail.snippets.models import register_snippet
 
+from longclaw.settings import ORDER_MODEL
+
 
 @register_snippet
 class Subscription(models.Model):
     ''' 
     Holds information relating to a single subscription
     '''
+    MONDAY = 0
+    TUESDAY = 1
+    WEDNESDAY = 2
+    THURSDAY = 3
+    FRIDAY = 4
+    SATURDAY = 5
+    SUNDAY = 6
+    WEEKDAYS = (
+        (MONDAY, 'Monday'), 
+        (TUESDAY, 'Tuesday'), 
+        (WEDNESDAY, 'Wednesday'), 
+        (THURSDAY, 'Thursday'), 
+        (FRIDAY, 'Friday'), 
+        (SATURDAY, 'Saturday'), 
+        (SUNDAY, 'Sunday'),
+    )
+    
     account = models.ForeignKey('account.Account', related_name='subscriptions', on_delete=models.SET_NULL, blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
     last_modified = models.DateTimeField(auto_now=True)
     last_dispatch = models.DateTimeField(blank=True, null=True)
     next_dispatch = models.DateTimeField(blank=True, null=True)
+    repeat_weekly = models.BooleanField(default=False)
+    repeat_monthly = models.BooleanField(default=False)
     repeat_period = models.IntegerField(blank=True, null=True, help_text='The amount of days until the order is to be repeated')
+    day_of_week = models.CharField(max_length=20, choices=WEEKDAYS, default=MONDAY)
     one_click_reminder = models.BooleanField(default=False, help_text='Whether or not to require a customer confirmation before dispatching the order')
     active = models.BooleanField(default=False, help_text='Whether or not this subscription should be dispatched as normal')
     shipping_address = models.ForeignKey('shipping.Address', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
     billing_address = models.ForeignKey('shipping.Address', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
+    selected_payment_method = models.ForeignKey('account.PaymentMethod', related_name='subscriptions', on_delete=models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
         return f'{self.id} - {self.account}'
@@ -57,7 +80,7 @@ class Subscription(models.Model):
 
 class SubscriptionOrderRelation(models.Model):
     subscription = models.ForeignKey('subscriptions.Subscription', related_name='+', on_delete=models.DO_NOTHING)
-    order = models.ForeignKey('orders.Order', related_name='+', on_delete=models.DO_NOTHING)
+    order = models.ForeignKey(ORDER_MODEL, related_name='+', on_delete=models.DO_NOTHING)
 
 
 class SubscriptionOrderItem(models.Model):
