@@ -84,7 +84,10 @@ class PaymentMethod(models.Model):
 
     @property
     def is_active_payment_method(self):
-        return self.id == self.account.active_payment_method.id
+        if self.id and self.account and self.account.active_payment_method:
+            return self.id == self.account.active_payment_method.id
+        else:
+            return False
 
     def deactivate(self):
         self.status = self.DEACTIVATED
