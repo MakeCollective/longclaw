@@ -1,9 +1,12 @@
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 
 from wagtail.snippets.models import register_snippet
 
 from longclaw.settings import ORDER_MODEL
+
+import datetime
 
 
 @register_snippet
@@ -33,6 +36,7 @@ class Subscription(models.Model):
     last_modified = models.DateTimeField(auto_now=True)
     last_dispatch = models.DateField(blank=True, null=True)
     next_dispatch = models.DateField(blank=True, null=True)
+    dispatch_count = models.IntegerField(default=0, help_text='The amount of times this Subscription has been dispatched')
     # repeat_weekly = models.BooleanField(default=False)
     # repeat_monthly = models.BooleanField(default=False)
     # repeat_period = models.IntegerField(blank=True, null=True, help_text='The amount of days until the order is to be repeated')
