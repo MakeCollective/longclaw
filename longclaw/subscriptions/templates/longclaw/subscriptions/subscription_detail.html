@@ -35,28 +35,12 @@
             <td>{{subscription.next_dispatch}}</td>
         </tr>
         <tr>
-            <td>repeat_weekly</td>
-            <td>{{subscription.repeat_weekly}}</td>
+            <td>dispatch_day_of_week</td>
+            <td>{{subscription.dispatch_day_of_week}}</td>
         </tr>
         <tr>
-            <td>repeat_monthly</td>
-            <td>{{subscription.repeat_monthly}}</td>
-        </tr>
-        <tr>
-            <td>day_of_week</td>
-            <td>{{subscription.day_of_week}}</td>
-        </tr>
-        <tr>
-            <td>day_of_week display</td>
-            <td>{{subscription.get_day_of_week_display}}</td>
-        </tr>
-        <tr>
-            <td>repeat_period</td>
-            <td>{{subscription.repeat_period}}</td>
-        </tr>
-        <tr>
-            <td>repeat_period</td>
-            <td>{{subscription.repeat_period}}</td>
+            <td>dispatch_day_of_week display</td>
+            <td>{{subscription.get_dispatch_day_of_week_display}}</td>
         </tr>
         <tr>
             <td>one_click_reminder</td>
@@ -78,6 +62,29 @@
             <td>payment_method</td>
             <td>{{subscription.payment_method}}</td>
         </tr>
+    </tbody>
+</table>
+
+<br>
+
+<table>
+    <thead>
+        <tr>
+            <td>Item</td>
+            <td>Quantity</td>
+            <td>PPU</td>
+            <td>Total</td>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in subscription.items.all %}
+        <tr>
+            <td>{{item}}</td>
+            <td>{{item.quantity}}</td>
+            <td>{{item.product.price}}</td>
+            <td>{{item.total}}</td>
+        </tr>
+        {% endfor %}
     </tbody>
 </table>
 

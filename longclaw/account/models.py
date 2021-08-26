@@ -94,6 +94,9 @@ class PaymentMethod(models.Model):
         self.save()
         return self
     
+    def is_valid(self):
+        return self.status == self.ACTIVE
+    
 
 class StripePaymentMethod(PaymentMethod):
     '''

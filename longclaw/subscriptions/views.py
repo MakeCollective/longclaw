@@ -12,6 +12,7 @@ from longclaw.subscriptions.utils import create_subscription_order
 from longclaw.subscriptions.forms import SubscriptionForm
 from longclaw.orders.models import Order
 from longclaw.shipping.forms import AddressForm
+from longclaw.account.models import StripePaymentMethod
 
 from django.conf import settings
 ProductVariant = apps.get_model(*settings.PRODUCT_VARIANT_MODEL.split('.'))
@@ -91,10 +92,18 @@ class SubscriptionCreateView(LoginRequiredMixin, TemplateView):
 
     def get(self, request):
         context = self.get_context(request)
+
+        try:
+            account = request.user.account
+        except Exception as e:
+            raise e
         
         basket, bid = get_basket_items(request)
 
-        subscription_form = SubscriptionForm
+        subscription_form = SubscriptionForm()
+        if account.active_payment_method:
+            subscription_form.initial['selected_payment_method'] = account.active_payment_method.id
+        subscription_form.fields['selected_payment_method'].queryset = StripePaymentMethod.objects.filter(account=account)
         
         # Get address form(s)
         shipping_address_form = AddressForm(prefix='shipping_address', instance=context.get('shipping_address'), use_required_attribute=False)
@@ -133,54 +142,83 @@ class SubscriptionCreateView(LoginRequiredMixin, TemplateView):
         # Get address form(s)
         default_addresses = request.POST.get('default_addresses')
         shipping_billing_address_same = request.POST.get('shipping_billing_address_same')
-        if default_addresses:
-            shipping_address = account.shipping_address
-            billing_address = account.billing_address
-
-            # Create order here
-            create_subscription_order(
-                request, account,
-                shipping_address=shipping_address, 
-                billing_address=billing_address,
-            )
-            return redirect(self.success_url)
-        else:
-            shipping_address_form = AddressForm(request.POST, prefix='shipping_address', instance=context.get('shipping_address'), use_required_attribute=False)
-
-            if not shipping_billing_address_same:
-                billing_address_form = AddressForm(request.POST, prefix='billing_address', instance=context.get('billing_address'), use_required_attribute=False)
-            else:
-                billing_address_form = AddressForm(prefix='billing_address', use_required_attribute=False)
-
-
-            errors = False
-            
-            if not shipping_address_form.is_valid():
-                print('shipping_address_form is invalid')
-                errors = True
-            
-            if not billing_address_form.is_valid():
-                print('billing_address_form is invalid')
-                errors = True
-
-            if not errors:
-                print('*'*80)
-                print('no errors, do the thing')
-                print('*'*80)
-                if shipping_address_form.changed():
-                    shipping_address = shipping_address_form.save()
-                
-                if not shipping_billing_address_same:
-                    billing_address = billing_address_form.save()
-          
+        subscription_form = SubscriptionForm(request.POST)
+        errors = False
         
+        if subscription_form.is_valid():
+
+            try:
+                payment_method = StripePaymentMethod.objects.get(id=subscription_form['selected_payment_method'].value())
+            except StripePaymentMethod.DoesNotExist:
+                # Can't find the payment method, send back an error, we can't proceed
+                errors = True
+                
+
+            print('$'*80)
+            print(subscription_form)
+            print(subscription_form.fields)
+            print('$'*80)
+            
+            if default_addresses and not errors:
+                shipping_address = account.shipping_address
+                billing_address = account.billing_address
+
                 # Create order here
+                create_subscription_order(
+                    request, account,
+                    shipping_address=shipping_address, 
+                    billing_address=billing_address,
+                    dispatch_frequency=subscription_form['dispatch_frequency'].value(),
+                    dispatch_day_of_week=subscription_form['dispatch_day_of_week'].value(),
+                    selected_payment_method=payment_method,
+                )
                 return redirect(self.success_url)
+            else:
+                shipping_address_form = AddressForm(request.POST, prefix='shipping_address', instance=context.get('shipping_address'), use_required_attribute=False)
+
+                if not shipping_billing_address_same:
+                    billing_address_form = AddressForm(request.POST, prefix='billing_address', instance=context.get('billing_address'), use_required_attribute=False)
+                else:
+                    billing_address_form = AddressForm(prefix='billing_address', use_required_attribute=False)
 
 
-        # Create the order based on the current basket
-        # Order.objects.create()
-        # create_subscription_order
+                
+                if not shipping_address_form.is_valid():
+                    print('shipping_address_form is invalid')
+                    errors = True
+                
+                if not billing_address_form.is_valid():
+                    print('billing_address_form is invalid')
+                    errors = True
+
+                if not errors:
+                    print('*'*80)
+                    print('no errors, do the thing')
+                    print('*'*80)
+                    if shipping_address_form.changed():
+                        shipping_address = shipping_address_form.save()
+                    
+                    if not shipping_billing_address_same:
+                        billing_address = billing_address_form.save()
+
+                    # Create order here
+                    create_subscription_order(
+                        request, account,
+                        shipping_address=shipping_address, 
+                        billing_address=billing_address,
+                        dispatch_frequency=subscription_form['dispatch_frequency'].value(),
+                        dispatch_day_of_week=subscription_form['dispatch_day_of_week'].value(),
+                        selected_payment_method=payment_method,
+                    )
+            
+            
+                    # Create order here
+                    return redirect(self.success_url)
+
+
+            # Create the order based on the current basket
+            # Order.objects.create()
+            # create_subscription_order
         
 
         context.update({
