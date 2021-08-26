@@ -3,6 +3,20 @@ from django.conf import settings
 import stripe
 
 
+def create_stripe_customer(email, name, phone):
+    if not settings.STRIPE_SECRET_KEY:
+        raise RuntimeError('Missing setting "STRIPE_SECRET_KEY"')
+
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+
+    customer = stripe.Customer.create(
+        email=email,
+        name=name,
+        phone=phone,
+    )
+    return customer
+
+
 def create_stripe_payment_method(number, exp_month, exp_year, cvc):
     ''' 
     Sends a request to the Stripe API to create a PaymentMethod

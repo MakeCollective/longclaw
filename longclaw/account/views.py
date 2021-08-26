@@ -15,7 +15,7 @@ from longclaw.account.forms import (
     StripePaymentMethodForm,
 )
 from longclaw.shipping.forms import AddressForm
-from longclaw.account.utils import create_stripe_payment_method
+from longclaw.account.utils import attach_stripe_payment_method, create_stripe_payment_method
 
 import json
 import stripe
@@ -395,9 +395,13 @@ class PaymentMethodCreateView(LoginRequiredMixin, TemplateView):
             payment_method.account = account
             payment_method.save()
 
+            # Attach the payment method to the stripe customer id
+            attach_stripe_payment_method(payment_method.stripe_id, account.stripe_customer_id)
+
             # If no payment method is default for an account yet, make this one the default
             if not account.active_payment_method:
                 account.active_payment_method = payment_method
+                account.save()
                 
             return redirect(reverse('payment_method_create_success'))
         else:

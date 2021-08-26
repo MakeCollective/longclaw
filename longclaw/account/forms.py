@@ -7,7 +7,7 @@ from django.utils.translation import gettext, gettext_lazy as _
 
 from longclaw.account.models import Account, StripePaymentMethod
 from longclaw.shipping.forms import AddressForm
-from longclaw.account.utils import create_stripe_payment_method
+from longclaw.account.utils import create_stripe_customer, create_stripe_payment_method
 
 import stripe
 
@@ -122,11 +122,22 @@ class SignupForm(AccountForm):
                 first_name=cleaned_data.get('first_name'),
                 last_name=cleaned_data.get('last_name'),
             )
+        
+        # Create a Stripe user to save PaymentMethods against later on
+        try:
+            stripe_customer = create_stripe_customer(
+                cleaned_data.get('email'), 
+                cleaned_data.get('name'), 
+                cleaned_data.get('phone'),
+            )
+        except Exception as e:
+            raise e
 
         account = Account.objects.create(
             user=user,
             phone=cleaned_data.get('phone'),
             company_name=cleaned_data.get('company_name'),
+            stripe_customer_id=stripe_customer.id,
         )
         return account        
 
