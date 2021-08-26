@@ -122,8 +122,8 @@ def check_erroneous_subscriptions():
     erroneous_subscriptions = Subscription.objects.filter(next_dispatch__lt=timezone.now(), active=True)
 
     if erroneous_subscriptions.exists():
-        id_list = erroneous_subscriptions.values_list('id', flat=True)
-        render_to_string('longclaw/subscriptions/erroneous_subscriptions.html', context={'erroneous_subscriptions': erroneous_subscriptions})
+        id_list = list(erroneous_subscriptions.values_list('id', flat=True))
+        # render_to_string('longclaw/subscriptions/erroneous_subscriptions.html', context={'erroneous_subscriptions': erroneous_subscriptions})
         # Send an email to admin or something?
         raise ValueError(f'Erroneous subscriptions, investigate these Subscription IDs: {id_list}')
         
@@ -193,9 +193,6 @@ def create_order_from_subscription(subscription):
             description=description,
             confirm=True, # The same as creating and confirming a PaymentIntent in the same step
         )
-        print('*'*80)
-        print(stripe_payment_intent)
-        print('*'*80)
     except PaymentError as e:
         order.status = order.FAILURE
         order.status_note = str(e)
@@ -211,6 +208,4 @@ def create_order_from_subscription(subscription):
     # Move next dispatch date
     subscription.update_dispatch_date()
     
-    
-
     return order

@@ -93,7 +93,6 @@ class Subscription(models.Model):
             return self.billing_address
     
     def update_dispatch_date(self):
-        print('update_dispatch_date')
         self.last_dispatch = timezone.now()
         self.next_dispatch = timezone.now() + datetime.timedelta(weeks=self.dispatch_frequency)
         
