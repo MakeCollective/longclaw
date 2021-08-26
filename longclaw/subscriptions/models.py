@@ -68,9 +68,6 @@ class Subscription(models.Model):
     def pause(self):
         self.active = False
         self.save()
-
-    # def cancel(self):
-    #     del self
     
     def update_next_dispatch(self, date):
         self.next_dispatch = date

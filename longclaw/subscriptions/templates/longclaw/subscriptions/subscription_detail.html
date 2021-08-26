@@ -92,6 +92,15 @@
     </tbody>
 </table>
 
+<br>
+
+<h3>Actions</h3>
+<ul>
+    <li><a href="/api/subscriptions/{{subscription.id}}/activate/" target="_blank">Activate</a></li>
+    <li><a href="/api/subscriptions/{{subscription.id}}/pause/" target="_blank">Pause</a></li>
+    {% comment %} <li><a href="/api/subscriptions/{{subscription.id}}/delete/" target="_blank">Delete</a></li> {% endcomment %}
+</ul>
+
 
 {% include "longclaw/account/account_nav.html" %}
 
