@@ -1,0 +1,107 @@
+{% extends "longclaw/account/account_base.html" %}
+
+{% block content %}
+
+<h1>Subscription detail</h1>
+
+<p><a href="{% url 'subscriptions_index' %}">Subscription Index</a></p>
+
+<table>
+    <thead>
+        <tr>
+            <td>Data</td>
+            <td>Value</td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>account</td>
+            <td>{{subscription.account}}</td>
+        </tr>
+        <tr>
+            <td>created</td>
+            <td>{{subscription.created}}</td>
+        </tr>
+        <tr>
+            <td>last_modified</td>
+            <td>{{subscription.last_modified}}</td>
+        </tr>
+        <tr>
+            <td>last_dispatch</td>
+            <td>{{subscription.last_dispatch}}</td>
+        </tr>
+        <tr>
+            <td>next_dispatch</td>
+            <td>{{subscription.next_dispatch}}</td>
+        </tr>
+        <tr>
+            <td>dispatch_day_of_week</td>
+            <td>{{subscription.dispatch_day_of_week}}</td>
+        </tr>
+        <tr>
+            <td>dispatch_day_of_week display</td>
+            <td>{{subscription.get_dispatch_day_of_week_display}}</td>
+        </tr>
+        <tr>
+            <td>dispatch_count</td>
+            <td>{{subscription.dispatch_count}}</td>
+        </tr>
+        <tr>
+            <td>one_click_reminder</td>
+            <td>{{subscription.one_click_reminder}}</td>
+        </tr>
+        <tr>
+            <td>active</td>
+            <td>{{subscription.active}}</td>
+        </tr>
+        <tr>
+            <td>shipping_address</td>
+            <td>{{subscription.shipping_address}}</td>
+        </tr>
+        <tr>
+            <td>billing_address</td>
+            <td>{{subscription.billing_address}}</td>
+        </tr>
+        <tr>
+            <td>payment_method</td>
+            <td>{{subscription.payment_method}}</td>
+        </tr>
+    </tbody>
+</table>
+
+<br>
+
+<table>
+    <thead>
+        <tr>
+            <td>Item</td>
+            <td>Quantity</td>
+            <td>PPU</td>
+            <td>Total</td>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in subscription.items.all %}
+        <tr>
+            <td>{{item}}</td>
+            <td>{{item.quantity}}</td>
+            <td>{{item.product.price}}</td>
+            <td>{{item.total}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<br>
+
+<h3>Actions</h3>
+<ul>
+    <li><a href="/api/subscriptions/{{subscription.id}}/activate/" target="_blank">Activate</a></li>
+    <li><a href="/api/subscriptions/{{subscription.id}}/pause/" target="_blank">Pause</a></li>
+    {% comment %} <li><a href="/api/subscriptions/{{subscription.id}}/delete/" target="_blank">Delete</a></li> {% endcomment %}
+</ul>
+
+
+{% include "longclaw/account/account_nav.html" %}
+
+{% endblock content %}

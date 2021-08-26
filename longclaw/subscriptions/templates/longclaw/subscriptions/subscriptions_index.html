@@ -4,19 +4,12 @@
 
 <h1>Subscriptions index</h1>
 
+<p><a href="{% url 'subscription_create' %}">Create Subscription</a></p>
+
 <ul>
     {% for subscription in subscriptions %}
         <li>
-            <ul>
-                <li>{{subscription.account.name}}</li>
-                <li>
-                    <ul>
-                        {% for item in subscription.items.all %}
-                            <li>{{item}}</li>
-                        {% endfor %}
-                    </ul>
-                </li>
-            </ul>
+            <a href="{% url 'subscription_detail' subscription_id=subscription.id %}">{{subscription}}</a>
         </li>
     {% endfor %}
 </ul>

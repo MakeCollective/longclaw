@@ -5,15 +5,26 @@
 <h1>Subscription create</h1>
 
 
-<p>Items in basket (will be turned into a subscription)</p>
 {% comment %} <ul>
     {% for item in basket %}
         <li>{{item}} -- &dollar;{{item.total}}</li>
     {% endfor %}
 </ul> {% endcomment %}
 
+
 <form action="." method="post">
     {% csrf_token %}
+
+    {# Subscription form fields #}
+    {% for field in subscription_form %}
+        <div class="form-row">
+            {{field.errors}}
+            {{field.label_tag}} {{field}}
+        </div>
+    {% endfor %}
+    
+
+    <p>Items in basket (will be turned into a subscription)</p>
     <table>
         <thead>
             <tr>

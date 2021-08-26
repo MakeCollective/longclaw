@@ -1,0 +1,98 @@
+<div style="width: 400px;">
+    <label for="card-element">Card</label>
+    <div id="card-element"></div>
+    <button type="button" onclick="submitStripe()">Check card</button>
+    <p id="card-result-message" hidden></p>
+</div>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+const stripe = Stripe('{{stripe_public_key}}');
+var elements = stripe.elements();
+var cardElement = elements.create('card');
+cardElement.mount('#card-element');
+const formEl = document.getElementById('{{form}}');
+const cardResultMessage = document.getElementById('card-result-message');
+
+
+formEl.addEventListener('paymentMethodCreated', function(e) {
+    console.log('paymentMethodCreated event listener');
+    // Add a hidden input on the form to put the PaymentMethod billing_details
+    console.log(e);
+    console.log(e.detail.pm);
+
+    var paymentMethodInput = document.createElement('input');
+    paymentMethodInput.setAttribute('type', 'hidden');
+    paymentMethodInput.setAttribute('name', 'payment_method');
+    paymentMethodInput.setAttribute('value', JSON.stringify(e.detail.pm));
+    this.appendChild(paymentMethodInput);
+});
+
+function submitStripe() {
+    stripe.createPaymentMethod({
+        type: 'card',
+        card: cardElement,
+        billing_details: {
+            name: 'Chuck Testa',
+        },
+    })
+    .then(function(result) {
+        if (result.error) {
+            conosle.log('Some error');
+            console.log(error);
+            cardResultMessage.removeAttribute('hidden');
+            cardResultMessage.innerHTML = 'Error';
+            return False
+        } else if (result.paymentMethod) {
+            console.log('Good -- got a paymentMethod');
+
+            var name = 'Test card 1'
+            var account = '{{request.user.account.id}}';
+            var pm = result.paymentMethod;
+
+            /*
+            var data = {
+                name: name,
+                account: account,
+                pm: pm,
+            };
+
+            createPaymentMethod(data);
+            */
+            
+            // Create an event to represent the Payment Method is created
+            var event = new CustomEvent('paymentMethodCreated', {
+                detail: {
+                    pm: pm,
+                }
+            });
+            formEl.dispatchEvent(event);
+            cardResultMessage.removeAttribute('hidden');
+            cardResultMessage.innerHTML = 'Success';
+            return False;
+            
+        } else {
+            console.log('Some other unexpected result');
+            return False;
+        }
+    });
+}
+
+function createPaymentMethod(data) {
+    console.log('createPaymentMethod');
+    console.log('{{csrf_token}}');
+
+    var headers = {
+        'X-CSRFToken': '{{csrf_token}}',
+    };
+
+    fetch('.', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(data),
+    }).then(response => {
+        console.log('Response:', response);
+    });
+    
+}
+</script>

@@ -7,7 +7,7 @@
 {% block content %}
 <h1>Signup page</h1>
 
-<form action="." method='post'>
+<form action="." method='post' id='signup-form'>
     {% csrf_token %}
     <div class="user-form-fields">
         {{user_form.errors}}
@@ -48,6 +48,13 @@
             </div>
         {% endfor %}
     </div>
+
+    {% comment %} <div id="payment-method-fields">
+        <h3>Payment details</h3>
+        <div class="form-row">
+            {% include 'longclaw/account/stripe_payment_method_create.html' with form='signup-form' %}
+        </div>
+    </div> {% endcomment %}
 
     <div class="action-buttons">
         <input class="button" type="submit" value="Submit">

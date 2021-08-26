@@ -24,8 +24,8 @@ ORDER_MODEL = getattr(
 ORDER_LIST_VIEW_URL = '/admin/orders/order/'
 
 # Only required if using Stripe as the payment gateway
-STRIPE_PUBLISHABLE = getattr(settings, 'STRIPE_PUBLISHABLE', '')
-STRIPE_SECRET = getattr(settings, 'STRIPE_SECRET', '')
+STRIPE_PUBLIC_KEY = getattr(settings, 'STRIBE_PUBLIC_KEY', '')
+STRIPE_SECRET_KEY = getattr(settings, 'STRIPE_SECRET_KEY', '')
 
 # Only required if using Braintree as the payment gateway
 BRAINTREE_SANDBOX = getattr(settings, 'BRAINTREE_SANDBOX', False)
