@@ -67,7 +67,7 @@ class PaymentMethod(models.Model):
     EXPIRED = 4
     STATUSES = (
         (ACTIVE, 'Active'),
-        (DEACTIVATED, 'Deactivate'),
+        (DEACTIVATED, 'Deactivated'),
         (INVALID, 'Invalid'),
         (EXPIRED, 'Expired'),
     )

@@ -135,6 +135,12 @@ def create_order_from_subscription(subscription):
     '''
     print('create_order_from_subscription')
 
+    # Check that payment method is valid/active
+    if not subscription.selected_payment_method.status == subscription.ACTIVE:
+        print('Subscription payment method is not active')
+        # Send an email to admin
+        return None
+
     # Figure out shipping cost
     shipping_rate = 0 # Temporary
 
