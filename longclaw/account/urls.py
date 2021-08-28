@@ -40,7 +40,8 @@ urls_no_prefix = [
 
 api_urls_no_prefix = [
     path('payment-methods/<int:pm_id>/set-default/', api.payment_method_set_default, name='payment_method_set_default'),
-    path('payment-methods/<int:pm_id>/delete/', api.payment_method_deactivate, name='payment_method_deactivate'),
+    path('payment-methods/<int:pm_id>/deactivate/', api.payment_method_deactivate, name='payment_method_deactivate'),
+    path('payment-methods/<int:pm_id>/delete/', api.payment_method_delete, name='payment_method_delete'),
 
 ]
 
