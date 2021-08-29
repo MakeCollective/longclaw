@@ -13,6 +13,7 @@ from longclaw.subscriptions.forms import SubscriptionForm
 from longclaw.orders.models import Order
 from longclaw.shipping.forms import AddressForm
 from longclaw.account.models import StripePaymentMethod
+from longclaw.shipping.models.rates import ShippingRate
 
 from django.conf import settings
 ProductVariant = apps.get_model(*settings.PRODUCT_VARIANT_MODEL.split('.'))
@@ -36,7 +37,7 @@ def test_add_to_basket(request):
 
 
 class SubscriptionIndexView(LoginRequiredMixin, View):
-    login_view = reverse_lazy('login')
+    login_url = reverse_lazy('login')
     template_name = 'longclaw/subscriptions/subscriptions_index.html'
     
     def get(self, request):
@@ -51,7 +52,7 @@ class SubscriptionIndexView(LoginRequiredMixin, View):
 
 
 class SubscriptionDetailView(LoginRequiredMixin, View):
-    login_view = reverse_lazy('login')
+    login_url = reverse_lazy('login')
     template_name = 'longclaw/subscriptions/subscription_detail.html'
 
     def get(self, request, subscription_id):
@@ -69,7 +70,7 @@ class SubscriptionDetailView(LoginRequiredMixin, View):
 
     
 class SubscriptionCreateView(LoginRequiredMixin, TemplateView):
-    login_view = reverse_lazy('login')
+    login_url = reverse_lazy('login')
     template_name = 'longclaw/subscriptions/subscription_create.html'
     success_url = reverse_lazy('subscription_create_success')
 
@@ -81,11 +82,22 @@ class SubscriptionCreateView(LoginRequiredMixin, TemplateView):
         shipping_address = account.shipping_address
         billing_address = account.billing_address
 
+        items, _ = get_basket_items(self.request)
+        shipping_rate = ShippingRate.objects.first()
+        if shipping_rate:
+            default_shipping_rate = shipping_rate.rate
+        else:
+            default_shipping_rate = Configuration.objects.first().default_shipping_rate
+        total_price = sum(item.total() for item in items)
+
         context = {
             'product_variants': product_variants,
             'currency_html_code': Configuration.objects.first().currency_html_code,
             'shipping_address': shipping_address,
             'billing_address': billing_address,
+            'total_price': total_price,
+            'default_shipping_rate': round(default_shipping_rate, 2),
+            'total_plus_shipping': round(total_price + default_shipping_rate, 2),
         }
 
         return context
@@ -153,11 +165,11 @@ class SubscriptionCreateView(LoginRequiredMixin, TemplateView):
                 # Can't find the payment method, send back an error, we can't proceed
                 errors = True
                 
-
-            print('$'*80)
-            print(subscription_form)
-            print(subscription_form.fields)
-            print('$'*80)
+            try:
+                shipping_rate = ShippingRate.objects.get(id=subscription_form['shipping_rate'])
+            except ShippingRate.DoesNotExist:
+                errors = True
+            
             
             if default_addresses and not errors:
                 shipping_address = account.shipping_address
@@ -171,6 +183,7 @@ class SubscriptionCreateView(LoginRequiredMixin, TemplateView):
                     dispatch_frequency=subscription_form['dispatch_frequency'].value(),
                     dispatch_day_of_week=subscription_form['dispatch_day_of_week'].value(),
                     selected_payment_method=payment_method,
+                    shipping_rate=shipping_rate,
                 )
                 return redirect(self.success_url)
             else:
