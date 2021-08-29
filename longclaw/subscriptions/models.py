@@ -47,6 +47,7 @@ class Subscription(models.Model):
     shipping_address = models.ForeignKey('shipping.Address', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
     billing_address = models.ForeignKey('shipping.Address', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
     selected_payment_method = models.ForeignKey('account.StripePaymentMethod', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
+    shipping_rate = models.ForeignKey('shipping.ShippingRate', related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
 
     @property
     def payment_method(self):

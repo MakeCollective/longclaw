@@ -34,7 +34,7 @@ def create_subscription_order(
     dispatch_frequency=None,
     dispatch_day_of_week=None,
     selected_payment_method=None,
-    shipping_option=None,
+    shipping_rate=None,
     discount=None):
     """
     Create an order from a basket and customer infomation
@@ -74,6 +74,7 @@ def create_subscription_order(
         dispatch_frequency=dispatch_frequency,
         dispatch_day_of_week=dispatch_day_of_week,
         selected_payment_method=selected_payment_method,
+        shipping_rate=shipping_rate,
         next_dispatch=next_weekday_selected,
         active=True,
     )
@@ -142,19 +143,11 @@ def create_order_from_subscription(subscription):
         return None
 
     # Figure out shipping cost
-    shipping_rate = 0 # Temporary
-
-    # if shipping_country and shipping_option:
-    #     site_settings = Configuration.for_request(request)
-    #     shipping_rate = get_shipping_cost(
-    #         site_settings,
-    #         shipping_address.country.pk,
-    #         shipping_option,
-    #         basket_id=current_basket_id,
-    #         destination=shipping_address,
-    #     )['rate']
-    # else:
-    #     shipping_rate = Decimal(0)
+    if subscription.shipping_rate:
+        shipping_rate = subscription.shipping_rate.rate
+    else:
+        # Shouldn't come to to this
+        shipping_rate = 0
 
     order = Order(
         account=subscription.account,
