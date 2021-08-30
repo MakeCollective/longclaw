@@ -73,7 +73,7 @@ class PaymentMethod(models.Model):
     )
     
     account = models.ForeignKey('account.Account', related_name='payment_methods', on_delete=models.CASCADE)
-    label = models.CharField(max_length=255, help_text='User friendly label for the payment method')
+    label = models.CharField(max_length=255, help_text='User friendly label for the payment method', blank=True, null=True)
     status = models.IntegerField(default=ACTIVE, choices=STATUSES, help_text='Status to show if the PaymentMethod is active/deactive or otherwise')
     
     def __str__(self):
@@ -103,6 +103,7 @@ class StripePaymentMethod(PaymentMethod):
     A subclass of the PaymentMethod
     Holds Stripe specific fields
     '''
+    name = models.CharField(max_length=255, blank=True, null=True)
     stripe_id = models.CharField(max_length=255)
     last4 = models.CharField(max_length=255)
     payment_type = models.CharField(max_length=255, help_text='Will most likely be "card"')
