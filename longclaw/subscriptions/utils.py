@@ -90,6 +90,8 @@ def create_subscription_order(
             subscription=subscription
         )
         order_item.save()
+    
+    destroy_basket(request)
 
     return subscription
 
