@@ -17,7 +17,7 @@ def create_stripe_customer(email, name, phone):
     return customer
 
 
-def create_stripe_payment_method(number, exp_month, exp_year, cvc):
+def create_stripe_payment_method(name, number, exp_month, exp_year, cvc):
     ''' 
     Sends a request to the Stripe API to create a PaymentMethod
     '''
@@ -29,6 +29,7 @@ def create_stripe_payment_method(number, exp_month, exp_year, cvc):
     payment_method = stripe.PaymentMethod.create(
         type='card',
         card={
+            'name': name,
             'number': number,
             'exp_month': exp_month,
             'exp_year': exp_year,

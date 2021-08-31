@@ -176,6 +176,7 @@ class PaymentMethodForm(forms.Form):
 
 
 class StripePaymentMethodForm(PaymentMethodForm):
+    name = forms.CharField(label='Name')
 
     def save(self, commit=True):
         cleaned_data = self.cleaned_data
@@ -185,6 +186,7 @@ class StripePaymentMethodForm(PaymentMethodForm):
         # Try to create the stripe StripePaymentMethod here
         try:
             pm = create_stripe_payment_method(
+                cleaned_data.get('name'),
                 cleaned_data.get('number'),
                 cleaned_data.get('expiry_month'),
                 cleaned_data.get('expiry_year'),
