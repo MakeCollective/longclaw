@@ -375,12 +375,7 @@ class PaymentMethodCreateView(LoginRequiredMixin, TemplateView):
     def get(self, request):
         context = self.get_context_data(request)
 
-        context['stripe_payment_method_form'] = StripePaymentMethodForm(initial={
-            'number': '4242424242424242',
-            'expiry_month': 5,
-            'expiry_year': 27,
-            'cvc': 123,
-        })
+        context['stripe_payment_method_form'] = StripePaymentMethodForm()
         
         return render(request, self.template_name, context=context)
     
@@ -394,6 +389,8 @@ class PaymentMethodCreateView(LoginRequiredMixin, TemplateView):
             payment_method = stripe_payment_method_form.save(commit=False)
             payment_method.account = account
             payment_method.save()
+            account.active_payment_method = payment_method
+            account.save()
 
             # Attach the payment method to the stripe customer id
             attach_stripe_payment_method(payment_method.stripe_id, account.stripe_customer_id)
