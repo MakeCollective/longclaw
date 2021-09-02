@@ -126,3 +126,11 @@ class StripePaymentMethod(PaymentMethod):
             raise e
 
         return True
+
+    def __str__(self):
+        if self.label:
+            return self.label
+        elif self.name:
+            return self.name
+        else:
+            return f'{self.last4}, {self.exp_month}/{self.exp_year}'
