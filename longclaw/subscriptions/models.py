@@ -27,8 +27,19 @@ class Subscription(models.Model):
         (WEDNESDAY, 'Wednesday'), 
         (THURSDAY, 'Thursday'), 
         (FRIDAY, 'Friday'), 
-        (SATURDAY, 'Saturday'), 
-        (SUNDAY, 'Sunday'),
+        # (SATURDAY, 'Saturday'), 
+        # (SUNDAY, 'Sunday'),
+    )
+
+    WEEKLY = 1
+    EVERY_TWO_WEEKS = 2
+    EVERY_THREE_WEEKS = 3
+    EVERY_FOUR_WEEKS = 4
+    DISPATCH_FREQUENCY_CHOICES = (
+        (WEEKLY, 'Weekly'),
+        (EVERY_TWO_WEEKS, 'Every 2 weeks'),
+        (EVERY_THREE_WEEKS, 'Every 3 weeks'),
+        (EVERY_FOUR_WEEKS, 'Every 4 weeks'),
     )
     
     account = models.ForeignKey('account.Account', related_name='subscriptions', on_delete=models.SET_NULL, blank=True, null=True)
@@ -40,7 +51,7 @@ class Subscription(models.Model):
     # repeat_weekly = models.BooleanField(default=False)
     # repeat_monthly = models.BooleanField(default=False)
     # repeat_period = models.IntegerField(blank=True, null=True, help_text='The amount of days until the order is to be repeated')
-    dispatch_frequency = models.IntegerField(default=1, help_text='The frequency of the order being fulfilled, in weeks')
+    dispatch_frequency = models.IntegerField(choices=DISPATCH_FREQUENCY_CHOICES, default=WEEKLY, help_text='The frequency of the order being fulfilled')
     dispatch_day_of_week = models.IntegerField(choices=WEEKDAYS, default=MONDAY)
     one_click_reminder = models.BooleanField(default=False, help_text='Whether or not to require a customer confirmation before dispatching the order')
     active = models.BooleanField(default=False, help_text='Whether or not this subscription should be dispatched as normal')
