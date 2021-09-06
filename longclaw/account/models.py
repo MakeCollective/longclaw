@@ -77,7 +77,10 @@ class PaymentMethod(models.Model):
     status = models.IntegerField(default=ACTIVE, choices=STATUSES, help_text='Status to show if the PaymentMethod is active/deactive or otherwise')
     
     def __str__(self):
-        return f'{self.label}'
+        if self.label:
+            return self.label
+        else:
+            return f'{str(self.account)} - PaymentMethod ID: {self.id}'
 
     def check_valid(self):
         raise NotImplementedError
