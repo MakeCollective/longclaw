@@ -29,12 +29,14 @@ def create_stripe_payment_method(name, number, exp_month, exp_year, cvc):
     payment_method = stripe.PaymentMethod.create(
         type='card',
         card={
-            'name': name,
             'number': number,
             'exp_month': exp_month,
             'exp_year': exp_year,
             'cvc': cvc,
-        }
+        },
+        billing_details={
+            'name': name,
+        },
     )
     return payment_method
 
