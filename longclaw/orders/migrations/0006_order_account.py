@@ -7,7 +7,6 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('account', '0003_auto_20210826_2258'),
         ('orders', '0005_receipt_order_email'),
     ]
 
