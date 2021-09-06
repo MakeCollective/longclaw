@@ -176,7 +176,10 @@ class PaymentMethodForm(forms.Form):
 
 
 class StripePaymentMethodForm(PaymentMethodForm):
+    
     name = forms.CharField(label='Name')
+
+    field_order = ['name', 'number', 'expiry_month', 'expiry_year', 'cvc']
 
     def save(self, commit=True):
         cleaned_data = self.cleaned_data
@@ -203,6 +206,7 @@ class StripePaymentMethodForm(PaymentMethodForm):
             card = pm.get('card')
             payment_method = StripePaymentMethod(
                 label=self.cleaned_data.get('label'),
+                name=self.pm.get('name'),
                 stripe_id=pm.get('id'),
                 last4=card.get('last4'),
                 payment_type=pm.get('type'),
