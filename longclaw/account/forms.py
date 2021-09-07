@@ -163,21 +163,20 @@ class LoginForm(AuthenticationForm):
 
 class PaymentMethodForm(forms.Form):
     label = forms.CharField(label='Label')
-    number = forms.CharField(label='Card number')
-    expiry_month = forms.CharField(
-        label='Expiry month',
-    )
-    expiry_year = forms.CharField(
-        label='Expiry year',
-    )
-    cvc = forms.CharField(
-        label='CVC',
-    )
+    number = forms.CharField(label='Card number', max_length=16,
+        widget=forms.TextInput(attrs={'placeholder': 'Card number'}))
+    expiry_month = forms.CharField(label='Expiry month', max_length=2,
+        widget=forms.TextInput(attrs={'placeholder': 'MM'}))
+    expiry_year = forms.CharField(label='Expiry year', max_length=2,
+        widget=forms.TextInput(attrs={'placeholder': 'YY'}))
+    cvc = forms.CharField(label='CVC', max_length=4,
+        widget=forms.TextInput(attrs={'placeholder': 'CVC'}))
 
 
 class StripePaymentMethodForm(PaymentMethodForm):
     
-    name = forms.CharField(label='Name')
+    name = forms.CharField(label='Name',
+        widget=forms.TextInput(attrs={'placeholder': 'Name on card'}))
 
     field_order = ['name', 'number', 'expiry_month', 'expiry_year', 'cvc']
 
