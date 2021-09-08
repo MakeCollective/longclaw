@@ -36,3 +36,7 @@ class BasketItem(models.Model):
             self.delete()
         else:
             self.save()
+    
+    @property
+    def product(self):
+        return self.variant
