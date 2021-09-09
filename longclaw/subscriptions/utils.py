@@ -208,5 +208,6 @@ def create_order_from_subscription(subscription):
 
     # Move next dispatch date
     subscription.update_dispatch_date()
+    subscription.increment_dispatch_count()
     
     return order

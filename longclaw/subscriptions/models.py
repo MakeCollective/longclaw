@@ -109,6 +109,9 @@ class Subscription(models.Model):
         if self.next_dispatch.weekday() != self.dispatch_day_of_week:
             raise ValueError(f'next_dispatch day of week [{self.next_dispatch.weekday()}] doesn\'t match dispatch_day_of_week [{self.dispatch_day_of_week}]')
         
+        self.save()
+    
+    def increment_dispatch_count(self):
         self.dispatch_count += 1
         self.save()
     
