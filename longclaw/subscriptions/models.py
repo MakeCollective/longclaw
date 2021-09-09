@@ -111,6 +111,32 @@ class Subscription(models.Model):
         
         self.save()
     
+    def next_weekday(self, d, weekday, same_day_acceptable=False):
+        ''' Adjust this if desired to allow Order to be dispatched on same day as Subscription created... maybe? '''
+        days_ahead = weekday - d.weekday()
+        if not same_day_acceptable:
+            if days_ahead <= 0: # Target day already happened this week
+                days_ahead += 7
+        else:
+            if days_ahead < 0:
+                days_ahead += 7
+        return d + datetime.timedelta(days_ahead)
+
+    def get_next_dispatch_date(self):
+        # if not self.paused # TODO logic for paused_until date
+        if self.last_dispatch:
+            next_dispatch_date = self.next_weekday(
+                self.last_dispatch + datetime.timedelta(weeks=self.dispatch_frequency), 
+                self.dispatch_day_of_week, 
+                same_day_acceptable=True
+            )
+        else:
+            next_dispatch_date = self.next_weekday(
+                timezone.now(), 
+                self.dispatch_day_of_week
+            )
+        return next_dispatch_date
+    
     def increment_dispatch_count(self):
         self.dispatch_count += 1
         self.save()
