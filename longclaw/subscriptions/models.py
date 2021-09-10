@@ -140,6 +140,12 @@ class Subscription(models.Model):
     def increment_dispatch_count(self):
         self.dispatch_count += 1
         self.save()
+    
+    def update_fields(self, **kwargs):
+        ''' Update the fields provided in kwargs '''
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+        self.save()
 
 
 class SubscriptionOrderItem(models.Model):
