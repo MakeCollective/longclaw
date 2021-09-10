@@ -27,7 +27,7 @@ def verify_discount_code(request):
                 return JsonResponse({
                     'success': False, 
                     'code': 'EXPIRED', 
-                    'reason': 'This discount code has past its expiry date',
+                    'reason': 'This discount code has passed its expiry date',
                     'coupon': {
                         'type': coupon.discount_type,
                         'value': coupon.discount_value,
