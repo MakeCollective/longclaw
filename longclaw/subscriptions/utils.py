@@ -4,7 +4,7 @@ from django.conf import settings
 
 from longclaw.basket.utils import get_basket_items, destroy_basket
 from longclaw.coupon.utils import discount_total
-from longclaw.subscriptions.models import Subscription, SubscriptionOrderItem,
+from longclaw.subscriptions.models import Subscription, SubscriptionOrderItem
 from longclaw.checkout.errors import PaymentError
 from longclaw.settings import STRIPE_SECRET_KEY
 from longclaw.configuration.models import Configuration
