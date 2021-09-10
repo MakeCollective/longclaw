@@ -7,7 +7,7 @@ from wagtail.core.models import Page
 
 from longclaw.account.models import Account
 from longclaw.subscriptions.models import (
-    Subscription, SubscriptionOrderRelation, SubscriptionOrderItem,
+    Subscription, SubscriptionOrderItem,
 )
 from longclaw.orders.models import Order
 
@@ -51,14 +51,14 @@ class SubscriptionOrderTestCase(TestCase):
             account=account,
         )
         order = Order.objects.create()
-        self.subscription_order_relation = SubscriptionOrderRelation.objects.create(
-            # Don't think anything is required
-            subscription=subscription,
-            order=order,
-        )
+        # self.subscription_order_relation = SubscriptionOrderRelation.objects.create(
+        #     # Don't think anything is required
+        #     subscription=subscription,
+        #     order=order,
+        # )
     
-    def test_check_subscription_order_exists(self):
-        assert isinstance(self.subscription_order_relation, SubscriptionOrderRelation)
+    # def test_check_subscription_order_exists(self):
+    #     assert isinstance(self.subscription_order_relation, SubscriptionOrderRelation)
 
 
 class SubscriptionOrderItemTestCase(TestCase):
@@ -78,11 +78,11 @@ class SubscriptionOrderItemTestCase(TestCase):
             account=account,
         )
         order = Order.objects.create()
-        self.subscription_order_relation = SubscriptionOrderRelation.objects.create(
-            # Don't think anything is required
-            subscription=subscription,
-            order=order,
-        )
+        # self.subscription_order_relation = SubscriptionOrderRelation.objects.create(
+        #     # Don't think anything is required
+        #     subscription=subscription,
+        #     order=order,
+        # )
 
         product_variant_model = apps.get_model(
             app_label=settings.PRODUCT_VARIANT_MODEL.split('.')[0], 

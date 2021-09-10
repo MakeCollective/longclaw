@@ -140,11 +140,6 @@ class Subscription(models.Model):
     def increment_dispatch_count(self):
         self.dispatch_count += 1
         self.save()
-    
-
-class SubscriptionOrderRelation(models.Model):
-    subscription = models.ForeignKey('subscriptions.Subscription', related_name='+', on_delete=models.DO_NOTHING)
-    order = models.ForeignKey(ORDER_MODEL, related_name='+', on_delete=models.DO_NOTHING)
 
 
 class SubscriptionOrderItem(models.Model):
