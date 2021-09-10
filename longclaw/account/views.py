@@ -108,6 +108,9 @@ class SignupView(View):
 
             # Login user
             login(request, account.user)
+
+            if request.POST.get('next'):
+                return redirect(request.POST.get('next'))
             
             return redirect(self.success_url)
         
