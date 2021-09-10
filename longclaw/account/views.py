@@ -63,6 +63,7 @@ class SignupView(View):
             'billing_address_form': self.address_form(prefix='billing_address', use_required_attribute=False),
             'shipping_billing_address_same': True,
             'stripe_public_key': settings.STRIPE_PUBLIC_KEY,
+            'next': request.GET.get('next'),
         }
         return context
 
