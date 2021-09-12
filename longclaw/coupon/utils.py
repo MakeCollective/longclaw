@@ -59,3 +59,22 @@ def discount_total(total, discount=None):
         amount_saved = total
     
     return new_total, amount_saved
+
+
+def discount_from_coupon(total, coupon):
+    if not coupon:
+        return total, 0
+
+    if coupon.discount_type == 'percentage':
+        new_total, amount_saved = discount_percentage(total, Decimal(coupon.discount_value))
+    elif coupon.discount_type == 'dollar':
+        new_total, amount_saved = discount_dollar(total, Decimal(coupon.discount_value))
+    else:
+        new_total = total
+        amount_saved = 0
+    
+    if new_total <= 0.5:
+        new_total = Decimal(0)
+        amount_saved = total
+    
+    return new_total, amount_saved
