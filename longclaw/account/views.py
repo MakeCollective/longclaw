@@ -80,8 +80,6 @@ class SignupView(View):
         shipping_billing_address_same = request.POST.get('shipping_billing_address_same')
         if not shipping_billing_address_same:
             billing_address_form = self.address_form(request.POST, prefix='billing_address', use_required_attribute=False)
-        else:
-            billing_address_form = self.address_form(prefix='billing_address', use_required_attribute=False)
 
 
         errors = False
@@ -103,6 +101,8 @@ class SignupView(View):
                 billing_address = billing_address_form.save()
                 account.billing_address = billing_address
                 account.shipping_billing_address_same = False
+            else:
+                account.billing_address = shipping_address
             
             # Save the shipping/billing address(es) to the Account
             account.save()
