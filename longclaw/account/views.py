@@ -206,11 +206,12 @@ class DetailsEditView(LoginRequiredMixin, View):
                 shipping_address = shipping_address_form.save()
                 account.shipping_address = shipping_address
             
-            if not billing_address_form:
-                account.billing_address = None
-            elif billing_address_form.has_changed():
-                billing_address = billing_address_form.save()
-                account.billing_address = billing_address
+            if not shipping_billing_address_same:
+                if billing_address_form.has_changed():
+                    billing_address = billing_address_form.save()
+                    account.billing_address = billing_address
+            else:
+                account.billing_address = account.shipping_address
             
             account.shipping_billing_address_same = True if shipping_billing_address_same else False
             account.save()
