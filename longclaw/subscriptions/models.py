@@ -102,13 +102,13 @@ class Subscription(models.Model):
             return self.billing_address
     
     def update_dispatch_date(self):
-        self.last_dispatch = timezone.now()
-        self.next_dispatch = timezone.now() + datetime.timedelta(weeks=self.dispatch_frequency)
+        self.last_dispatch = timezone.localdate(timezone.now())
+        self.next_dispatch = timezone.localdate(timezone.now() + datetime.timedelta(weeks=self.dispatch_frequency))
         
         # Sanity check that the next_dispatch is the correct day of the week
         if self.next_dispatch.weekday() != self.dispatch_day_of_week:
-            raise ValueError(f'next_dispatch day of week [{self.next_dispatch.weekday()}] doesn\'t match dispatch_day_of_week [{self.dispatch_day_of_week}]')
-        
+            raise ValueError(f'[Subscription ID: {self.id}] next_dispatch day of week [{self.next_dispatch.weekday()}] doesn\'t match dispatch_day_of_week [{self.dispatch_day_of_week}]')
+
         self.save()
     
     def next_weekday(self, d, weekday, same_day_acceptable=False):
