@@ -76,6 +76,7 @@ class SignupView(View):
         # validate forms
         user_form = self.signup_form(request.POST, prefix='user_form')
         shipping_address_form = self.address_form(request.POST, prefix='shipping_address')
+        billing_address_form = self.address_form(request.POST, prefix='billing_address', use_required_attribute=False)
 
         shipping_billing_address_same = request.POST.get('shipping_billing_address_same')
         if not shipping_billing_address_same:
