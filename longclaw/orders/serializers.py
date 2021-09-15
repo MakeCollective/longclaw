@@ -35,6 +35,10 @@ class OrderSerializer(serializers.ModelSerializer):
             rep['discount_value'] = discount.coupon.discount_string(discount.coupon.discount_value)
         except Discount.DoesNotExist:
             pass
+
+        discount_amount = value.discount_amount()
+        if discount_amount:
+            rep['discount_amount'] = discount_amount
         
         return rep
 

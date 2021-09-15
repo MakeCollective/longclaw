@@ -125,6 +125,16 @@ class Order(models.Model):
         self.shipping_status = new_shipping_status
         self.save()
         return self
+    
+    def discount_amount(self):
+        """Get the amount discounted on the order
+        """
+        discount = self.discounts.first() # There should only be one discount, as it is set up currently
+        if not discount:
+            return 0
+        
+        _, discounted_amount = discount_total(self.total, discount)
+        return discounted_amount
 
 
 class OrderItem(models.Model):
