@@ -34,11 +34,21 @@ class OrderSerializer(serializers.ModelSerializer):
             rep['discount_total'], amount_off = discount_total(value.total + value.shipping_rate, discount)
             rep['discount_value'] = discount.coupon.discount_string(discount.coupon.discount_value)
         except Discount.DoesNotExist:
-            pass
+            rep['discount_total'] = None
+            rep['discount_value'] = None
 
         discount_amount = value.discount_amount()
         if discount_amount:
             rep['discount_amount'] = discount_amount
+        else:
+            rep['discount_amount'] = None
+        
+        rep['coupon_code'] = None
+        if value.discounts.exists():
+            try:
+                rep['coupon_code'] = value.discounts.first().coupon.code
+            except Exception as e:
+                pass
         
         return rep
 
