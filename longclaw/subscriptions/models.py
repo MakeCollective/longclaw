@@ -103,7 +103,9 @@ class Subscription(models.Model):
     
     def update_dispatch_date(self):
         self.last_dispatch = timezone.localdate(timezone.now())
-        self.next_dispatch = timezone.localdate(timezone.now() + datetime.timedelta(weeks=self.dispatch_frequency))
+        self.next_dispatch = self.get_next_dispatch_date()
+        # self.next_dispatch = timezone.localdate(timezone.now() + datetime.timedelta(weeks=self.dispatch_frequency))
+
         
         # Sanity check that the next_dispatch is the correct day of the week
         if self.next_dispatch.weekday() != self.dispatch_day_of_week:
