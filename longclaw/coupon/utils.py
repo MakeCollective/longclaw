@@ -1,4 +1,6 @@
+from django.apps import apps
 from django.utils import timezone
+from django.conf import settings
 
 from decimal import Decimal
 import random
@@ -78,3 +80,25 @@ def discount_from_coupon(total, coupon):
         amount_saved = total
     
     return new_total, amount_saved
+
+
+def snapshot_discount_values():
+    '''Take a snapshot of the discount value and save it on each discount
+    Must check if a discount is for a subscription order so it is calculated correctly'''
+
+    Discount = apps.get_model('coupon.Discount')
+    discounts = Discount.objects.filter(order__isnull=False)
+    
+    for discount in discounts:
+        # Check if subscription order. Needs to be calculated differently
+        shipping_rate = discount.order.shipping_rate
+        order_total = sum(item.total for item in discount.order.items.all())
+        if discount.coupon.code == settings.SUBSCRIPTION_COUPON_CODE:
+            discounted_order_total, discounted_amount = discount_total(order_total, discount)
+        else:
+            discounted_order_total, discounted_amount = discount_total(order_total + shipping_rate, discount)
+        discount.value = discounted_amount
+
+        # print(f'#{discount.id} for #{discount.order.id} -- Sub? [{discount.coupon.code == settings.SUBSCRIPTION_COUPON_CODE}] -- Total: {order_total}, Shipping: {shipping_rate}, Value: {discount.value} -- Paid: {discount.order.total_paid}') # Discount value: {discount.coupon.discount_value}, Type: {discount.coupon.discount_type}')
+        
+        discount.save()
