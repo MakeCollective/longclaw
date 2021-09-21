@@ -92,6 +92,9 @@ module.exports = {
       filename: '[file].map[query]',
       append: '\n//# sourceMappingURL=http://127.0.0.1:3001/dist/js/[url]'
     }),
-    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)
+    new webpack.IgnorePlugin({
+      resourceRegExp: /^\.\/locale$/, 
+      contextRegExp: /moment$/
+    })
   ]
 }
