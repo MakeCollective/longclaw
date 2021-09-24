@@ -90,7 +90,8 @@ def verify_discount_code(request):
                     total_price += shipping_rate.rate
 
             discount_total_price, discount_total_saved = discount_total(total_price, discount)
-            
+            discount.value = discount_total_saved
+            discount.save()
         
             return JsonResponse({
                 'success': True,
