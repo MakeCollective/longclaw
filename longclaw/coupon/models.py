@@ -104,6 +104,8 @@ class Discount(models.Model):
     consumed = models.BooleanField(default=False)
     consumed_date = models.DateTimeField(blank=True, null=True)
 
+    value = models.DecimalField(default=0, max_digits=12, decimal_places=2)
+
     def consume(self, order=None):
         if not order:
             # raise some error
