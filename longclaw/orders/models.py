@@ -133,8 +133,7 @@ class Order(models.Model):
         if not discount:
             return 0
         
-        _, discounted_amount = discount_total(self.total, discount)
-        return discounted_amount
+        return discount.value
 
 
 class OrderItem(models.Model):

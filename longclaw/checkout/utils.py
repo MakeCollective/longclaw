@@ -114,8 +114,9 @@ def create_order(email,
         # last second check that the discount code can still be used
         if not discount.coupon.depleted:
             # Adjust the total by the discount
-            total, _ = discount_total(total, discount)
-            total = Decimal(total)
+            # total, _ = discount_total(total, discount)
+            # total = Decimal(total)
+            total -= discount.value
 
     if capture_payment:
         desc = 'Payment from {} for order id #{}'.format(email, order.id)
