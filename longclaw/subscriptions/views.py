@@ -205,9 +205,6 @@ class SubscriptionCreateView(LoginRequiredMixin, TemplateView):
                     errors = True
 
                 if not errors:
-                    print('*'*80)
-                    print('no errors, do the thing')
-                    print('*'*80)
                     if shipping_address_form.changed():
                         shipping_address = shipping_address_form.save()
                     

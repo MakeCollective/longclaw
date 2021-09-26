@@ -426,12 +426,6 @@ class PaymentMethodCreateSuccessView(LoginRequiredMixin, TemplateView):
 
 def add_payment_method_to_stripe_user(account, pm):
     stripe.api_key = settings.STRIPE_SECRET_KEY
-    
-    print('*'*80)
-    print(account)
-    print(account.stripe_customer_id)
-    print(pm.stripe_id)
-    print('*'*80)
 
     response = stripe.PaymentMethod.attach(
         pm.stripe_id,
