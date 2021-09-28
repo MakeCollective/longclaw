@@ -70,6 +70,9 @@ class Subscription(models.Model):
         else:
             return None
     
+    @property
+    def paused(self):
+        return timezone.localtime(timezone.now()).date() >= self.pause_until_date
 
     def __str__(self):
         return f'{self.id} - {self.account}'
