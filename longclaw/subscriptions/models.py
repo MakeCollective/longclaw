@@ -72,6 +72,8 @@ class Subscription(models.Model):
     
     @property
     def paused(self):
+        if not self.pause_until_date:
+            return False
         return timezone.localtime(timezone.now()).date() >= self.pause_until_date
 
     def __str__(self):
