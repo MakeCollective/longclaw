@@ -19,6 +19,8 @@ class SubscriptionForm(forms.ModelForm):
         #     'pause_until_date': CustomDateInput(),
         # }
 
+    pause_until_date = forms.DateField(widget=forms.HiddenInput, required=False)
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['dispatch_frequency'].label = 'Frequency'
