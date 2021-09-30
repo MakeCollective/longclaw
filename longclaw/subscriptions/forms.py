@@ -15,9 +15,9 @@ class SubscriptionForm(forms.ModelForm):
             'dispatch_frequency', 'dispatch_day_of_week', 'shipping_rate',
             'pause_until_date'
         ] # 'one_click_reminder', 
-        widgets = {
-            'pause_until_date': CustomDateInput(),
-        }
+        # widgets = {
+        #     'pause_until_date': CustomDateInput(),
+        # }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
