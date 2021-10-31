@@ -112,6 +112,7 @@ class Discount(models.Model):
             return
         self.order = order
         self.coupon.redemptions += 1
+        self.coupon.save()
         self.consumed = True
         self.consumed_date = timezone.now()
         self.save()
