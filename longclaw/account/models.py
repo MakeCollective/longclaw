@@ -65,7 +65,7 @@ class Account(models.Model):
         SnippetChooserPanel('billing_address'),
         FieldPanel('shipping_billing_address_same'),
         FieldPanel('stripe_customer_id'),
-        FieldPanel('active_payment_method'),
+        SnippetChooserPanel('active_payment_method'),
     ]
 
 class PaymentMethod(models.Model):
