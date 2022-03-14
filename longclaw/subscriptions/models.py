@@ -164,8 +164,6 @@ class Subscription(models.Model):
 
     panels = [
         SnippetChooserPanel('account'),
-        FieldPanel('created'),
-        FieldPanel('last_modified'),
         FieldPanel('last_dispatch'),
         FieldPanel('next_dispatch'),
         FieldPanel('dispatch_count'),
