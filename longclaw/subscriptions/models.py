@@ -2,6 +2,8 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 
+from wagtail.admin.edit_handlers import FieldPanel
+from wagtail.snippets.edit_handlers import SnippetChooserPanel
 from wagtail.snippets.models import register_snippet
 
 from longclaw.settings import ORDER_MODEL
@@ -158,6 +160,25 @@ class Subscription(models.Model):
         for k, v in kwargs.items():
             setattr(self, k, v)
         self.save()
+    
+
+    panels = [
+        SnippetChooserPanel('account'),
+        FieldPanel('created'),
+        FieldPanel('last_modified'),
+        FieldPanel('last_dispatch'),
+        FieldPanel('next_dispatch'),
+        FieldPanel('dispatch_count'),
+        FieldPanel('dispatch_frequency'),
+        FieldPanel('dispatch_day_of_week'),
+        FieldPanel('one_click_reminder'),
+        FieldPanel('active'),
+        SnippetChooserPanel('shipping_address'),
+        SnippetChooserPanel('billing_address'),
+        SnippetChooserPanel('selected_payment_method'),
+        SnippetChooserPanel('shipping_rate'),
+        FieldPanel('pause_until_date'),
+    ]
 
 
 class SubscriptionOrderItem(models.Model):
