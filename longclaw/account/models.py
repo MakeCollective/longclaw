@@ -2,6 +2,8 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
 
+from wagtail.admin.edit_handlers import FieldPanel
+from wagtail.snippets.edit_handlers import SnippetChooserPanel
 from wagtail.snippets.models import register_snippet
 
 
@@ -55,6 +57,16 @@ class Account(models.Model):
     # AccountPaymentMethod(s)
     # Future proofing in case an Account will have multiple payment methods (cards)
 
+    panels = [
+        SnippetChooserPanel('user'),
+        FieldPanel('phone'),
+        FieldPanel('company_name'),
+        SnippetChooserPanel('shipping_address'),
+        SnippetChooserPanel('billing_address'),
+        FieldPanel('shipping_billing_address_same'),
+        FieldPanel('stripe_customer_id'),
+        FieldPanel('active_payment_method'),
+    ]
 
 class PaymentMethod(models.Model):
     '''
