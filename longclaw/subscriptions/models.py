@@ -136,7 +136,10 @@ class Subscription(models.Model):
 
         return d + datetime.timedelta(days_ahead)
 
-    def get_next_dispatch_date(self):
+    def get_next_dispatch_date(self, from_date=None):
+        if not from_date:
+            from_date = timezone.localdate(timezone.now())
+        
         # if not self.paused # TODO logic for paused_until date
         if self.last_dispatch:
             next_dispatch_date = self.next_weekday(
