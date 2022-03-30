@@ -164,6 +164,20 @@ class Subscription(models.Model):
             setattr(self, k, v)
         self.save()
     
+    def next_dispatch_after_pause(self):
+        ''' Finds the next dispatch date after a pause period has ended '''
+        # Check if there is a pause_until_date, and is in future
+        today = timezone.localtime(timezone.now()).date()
+        if self.pause_until_date and self.pause_until_date > today:
+            # If next_dispatch was meant to happen after the pause date anyway - use that one
+            if self.pause_until_date and self.pause_until_date <= self.next_dispatch:
+                return self.next_dispatch
+            # Otherwise, find the next weekday after the end of the puase date
+            return self.next_weekday(self.pause_until_date, self.dispatch_day_of_week)
+        else:
+            # If no pause_until_date, or it has already passed, then get the existing next_dispatch
+            return self.next_dispatch
+    
 
     panels = [
         SnippetChooserPanel('account'),
