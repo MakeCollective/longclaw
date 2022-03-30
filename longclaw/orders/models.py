@@ -44,6 +44,7 @@ class Order(models.Model):
 
     total_paid = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
     account = models.ForeignKey('account.Account', related_name='orders', blank=True, null=True, on_delete=models.SET_NULL)
+    is_subscription_order = models.BooleanField(default=False)
 
     def __str__(self):
         return "Order #{} - {}".format(self.id, self.email)
