@@ -143,13 +143,13 @@ class Subscription(models.Model):
         # if not self.paused # TODO logic for paused_until date
         if self.last_dispatch:
             next_dispatch_date = self.next_weekday(
-                timezone.localdate(timezone.now()), 
+                from_date, 
                 self.dispatch_day_of_week,
                 frequency=self.dispatch_frequency,
             )
         else:
             next_dispatch_date = self.next_weekday(
-                timezone.localdate(timezone.now()),
+                from_date,
                 self.dispatch_day_of_week,
             )
         return next_dispatch_date
