@@ -79,7 +79,9 @@ class SignupView(View):
         billing_address_form = self.address_form(request.POST, prefix='billing_address', use_required_attribute=False)
 
         shipping_billing_address_same = request.POST.get('shipping_billing_address_same')
-        if not shipping_billing_address_same:
+        if shipping_billing_address_same:
+            billing_address_form = self.address_form(request.POST, prefix='shipping_address', use_required_attribute=False)
+        else:
             billing_address_form = self.address_form(request.POST, prefix='billing_address', use_required_attribute=False)
 
 
@@ -97,13 +99,11 @@ class SignupView(View):
         if not errors:
             account = user_form.save()
             shipping_address = shipping_address_form.save()
+            billing_address = billing_address_form.save()
             account.shipping_address = shipping_address
+            account.billing_address = billing_address
             if not shipping_billing_address_same:
-                billing_address = billing_address_form.save()
-                account.billing_address = billing_address
                 account.shipping_billing_address_same = False
-            else:
-                account.billing_address = shipping_address
             
             # Save the shipping/billing address(es) to the Account
             account.save()
@@ -179,11 +179,10 @@ class DetailsEditView(LoginRequiredMixin, View):
         shipping_address_form = AddressForm(request.POST, prefix='shipping_address', instance=account.shipping_address)
         
         shipping_billing_address_same = request.POST.get('shipping_billing_address_same')
-        if not shipping_billing_address_same:
-            billing_address_form = AddressForm(request.POST, prefix='billing_address', instance=account.billing_address, use_required_attribute=False)
+        if shipping_billing_address_same:
+            billing_address_form = self.address_form(request.POST, prefix='shipping_address', use_required_attribute=False, instance=account.billing_address)
         else:
-            # billing_address_form = AddressForm(prefix='billing_address', instance=account.billing_address, use_required_attribute=False)
-            billing_address_form = None
+            billing_address_form = self.address_form(request.POST, prefix='billing_address', use_required_attribute=False, instance=account.billing_address)
 
 
         errors = False
@@ -207,12 +206,9 @@ class DetailsEditView(LoginRequiredMixin, View):
                 shipping_address = shipping_address_form.save()
                 account.shipping_address = shipping_address
             
-            if not shipping_billing_address_same:
-                if billing_address_form.has_changed():
-                    billing_address = billing_address_form.save()
-                    account.billing_address = billing_address
-            else:
-                account.billing_address = account.shipping_address
+            if billing_address_form.has_changed():
+                billing_address = billing_address_form.save()
+                account.billing_address = billing_address
             
             account.shipping_billing_address_same = True if shipping_billing_address_same else False
             account.save()
