@@ -44,7 +44,7 @@ class Subscription(models.Model):
         (EVERY_FOUR_WEEKS, 'Every 4 weeks'),
     )
     
-    account = models.ForeignKey('account.Account', related_name='subscriptions', on_delete=models.SET_NULL, blank=True, null=True)
+    account = models.ForeignKey('account.Account', related_name='subscriptions', on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     last_modified = models.DateTimeField(auto_now=True)
     last_dispatch = models.DateField(blank=True, null=True)
