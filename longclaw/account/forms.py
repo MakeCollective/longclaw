@@ -160,6 +160,7 @@ class LoginForm(AuthenticationForm):
 
     def clean(self, *args, **kwargs):
 
+        # Test comment for update version
         cleaned_data = super().clean(*args, **kwargs)
         cleaned_data['username'] = cleaned_data['username'].lower()
         
