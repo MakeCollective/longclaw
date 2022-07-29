@@ -91,7 +91,7 @@ class SignupForm(AccountForm):
         
         # check if user exists
         if UserModel.objects.filter(email__iexact=email).count():
-            msg = 'Accout with that email already exists'
+            msg = 'Account with that email already exists'
             self.add_error('email', msg)
         
         try:
@@ -99,6 +99,8 @@ class SignupForm(AccountForm):
         except ValidationError as errors:
             for error in errors:
                 self.add_error('password', error)
+        
+        cleaned_data['email'] = cleaned_data['email'].lower()
         
         return cleaned_data
 
@@ -157,8 +159,11 @@ class LoginForm(AuthenticationForm):
         self.fields['username'].label = 'Email'
 
     def clean(self, *args, **kwargs):
+
+        cleaned_data = super().clean(*args, **kwargs)
+        cleaned_data['username'] = cleaned_data['username'].lower()
         
-        return super().clean(*args, **kwargs)
+        return cleaned_data
 
 
 class PaymentMethodForm(forms.Form):
