@@ -1,7 +1,7 @@
 from django import forms
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.contrib.auth import get_user_model, password_validation
+from django.contrib.auth import get_user_model, password_validation, authenticate
 from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm
 from django.utils.translation import gettext, gettext_lazy as _
 
@@ -158,13 +158,18 @@ class LoginForm(AuthenticationForm):
         super().__init__(*args, **kwargs)
         self.fields['username'].label = 'Email'
 
-    def clean(self, *args, **kwargs):
+    def clean(self):
+        username = self.cleaned_data.get('username').lower()
+        password = self.cleaned_data.get('password')
 
-        # Test comment for update version
-        cleaned_data = super().clean(*args, **kwargs)
-        cleaned_data['username'] = cleaned_data['username'].lower()
-        
-        return cleaned_data
+        if username is not None and password:
+            self.user_cache = authenticate(self.request, username=username, password=password)
+            if self.user_cache is None:
+                raise self.get_invalid_login_error()
+            else:
+                self.confirm_login_allowed(self.user_cache)
+
+        return self.cleaned_data
 
 
 class PaymentMethodForm(forms.Form):
