@@ -27,7 +27,8 @@ class StripePayment(BasePayment):
         except stripe.error.CardError as error:
             raise PaymentError(error.user_message)
         except Exception as e:
-            raise PaymentError('An unexpected error occured, please try again')
+            raise PaymentError(f'An unexpected error occured: {str(e)}')
+            # raise PaymentError('An unexpected error occured, please try again')
 
     def get_token(self, request):
         """ Create a stripe token for a card
