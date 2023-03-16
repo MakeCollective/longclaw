@@ -202,7 +202,7 @@ class SubscriptionOrderItem(models.Model):
     '''
     An individual item model that holds quantity and a reference to the product variant
     '''
-    product = models.ForeignKey(settings.PRODUCT_VARIANT_MODEL, on_delete=models.CASCADE)
+    product = models.ForeignKey(settings.PRODUCT_VARIANT_MODEL, blank=True, null=True, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
     subscription = models.ForeignKey('subscriptions.Subscription', related_name='items', on_delete=models.CASCADE)
 
