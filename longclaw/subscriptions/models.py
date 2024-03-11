@@ -192,8 +192,8 @@ class Subscription(models.Model):
         FieldPanel('active'),
         SnippetChooserPanel('shipping_address'),
         SnippetChooserPanel('billing_address'),
-        SnippetChooserPanel('selected_payment_method'),
-        SnippetChooserPanel('shipping_rate'),
+        # SnippetChooserPanel('selected_payment_method'),
+        FieldPanel('shipping_rate'),
         FieldPanel('pause_until_date'),
     ]
 

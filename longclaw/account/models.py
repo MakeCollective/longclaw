@@ -7,6 +7,7 @@ from wagtail.snippets.edit_handlers import SnippetChooserPanel
 from wagtail.snippets.models import register_snippet
 
 
+@register_snippet
 class Account(models.Model):
     '''
     Hold details about a user. Details include at a minimum the amount of information
@@ -65,7 +66,7 @@ class Account(models.Model):
         SnippetChooserPanel('billing_address'),
         FieldPanel('shipping_billing_address_same'),
         FieldPanel('stripe_customer_id'),
-        SnippetChooserPanel('active_payment_method'),
+        # SnippetChooserPanel('active_payment_method'),
     ]
 
 class PaymentMethod(models.Model):
@@ -113,6 +114,7 @@ class PaymentMethod(models.Model):
         return self.status == self.ACTIVE
     
 
+# @register_snippet
 class StripePaymentMethod(PaymentMethod):
     '''
     A subclass of the PaymentMethod
