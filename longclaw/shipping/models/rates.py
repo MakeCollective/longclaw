@@ -24,20 +24,22 @@ class ShippingRate(models.Model):
     basket_id = models.CharField(blank=True, db_index=True, max_length=32)
     destination = models.ForeignKey('shipping.Address', blank=True, null=True, on_delete=models.PROTECT)
     processor = models.ForeignKey('shipping.ShippingRateProcessor', blank=True, null=True, on_delete=models.PROTECT)
+    order_number = models.IntegerField(default=99)
 
     panels = [
         FieldPanel('name'),
         FieldPanel('rate'),
         FieldPanel('carrier'),
         FieldPanel('description'),
-        FieldPanel('countries')
+        FieldPanel('countries'),
+        FieldPanel('order_number'),
     ]
 
     def __str__(self):
         return self.name
 
     class Meta:
-        ordering = ['name',]
+        ordering = ['order_number', 'name',]
 
 
 @receiver(address_modified)
