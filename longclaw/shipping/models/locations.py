@@ -7,8 +7,8 @@ from wagtail.snippets.models import register_snippet
 @register_snippet
 class Address(models.Model):
     name = models.CharField(max_length=64)
-    line_1 = models.CharField(max_length=128)
-    line_2 = models.CharField(max_length=128, blank=True)
+    line_1 = models.CharField(verbose_name='Address line 1', max_length=128)
+    line_2 = models.CharField(verbose_name='Address line 2', max_length=128, blank=True)
     city = models.CharField(max_length=64)
     postcode = models.CharField(max_length=10)
     country = models.ForeignKey('shipping.Country', blank=True, null=True, on_delete=models.PROTECT)
@@ -22,8 +22,25 @@ class Address(models.Model):
         FieldPanel('country')
     ]
 
+    @property
+    def html_format(self):
+        string = ''
+        string += '{}<br>'.format(self.name)
+        string += '{}<br>'.format(self.line_1)
+        if self.line_2:
+            string += '{}<br>'.format(self.line_2)
+        string += '{}<br>'.format(self.city)
+        string += '{}<br>'.format(self.postcode)
+        if self.country:
+            string += '{}<br>'.format(self.country)
+        return string
+
     def __str__(self):
         return "{}, {}, {}".format(self.name, self.city, self.country)
+
+    class Meta:
+        verbose_name = 'Address'
+        verbose_name_plural = 'Addresses'
 
 
 class Country(models.Model):

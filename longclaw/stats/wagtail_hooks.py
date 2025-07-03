@@ -5,11 +5,12 @@ from longclaw.orders.models import Order
 from longclaw.stats import stats
 from longclaw.configuration.models import Configuration
 from longclaw.utils import ProductVariant, maybe_get_product_model
+from django.conf import settings
 
 
 class LongclawSummaryItem(SummaryItem):
     order = 10
-    template = 'stats/summary_item.html'
+    template = 'longclaw/stats/summary_item.html'
 
     def get_context(self):
         return {
@@ -26,7 +27,7 @@ class OutstandingOrders(LongclawSummaryItem):
         return {
             'total': orders.count(),
             'text': 'Outstanding Orders',
-            'url': '/admin/orders/order/',
+            'url': settings.ORDER_LIST_VIEW_URL,
             'icon': 'icon-warning'
         }
 
@@ -60,7 +61,7 @@ class MonthlySales(LongclawSummaryItem):
 
 class LongclawStatsPanel(SummaryItem):
     order = 110
-    template = 'stats/stats_panel.html'
+    template = 'longclaw/stats/stats_panel.html'
     def get_context(self):
         month_start, month_end = stats.current_month()
         daily_sales = stats.daily_sales(month_start, month_end)

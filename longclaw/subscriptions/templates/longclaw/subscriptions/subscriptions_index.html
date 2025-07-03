@@ -1,0 +1,19 @@
+{% extends "longclaw/account/account_base.html" %}
+
+{% block content %}
+
+<h1>Subscriptions index</h1>
+
+<p><a href="{% url 'subscription_create' %}">Create Subscription</a></p>
+
+<ul>
+    {% for subscription in subscriptions %}
+        <li>
+            <a href="{% url 'subscription_detail' subscription_id=subscription.id %}">{{subscription}}</a>
+        </li>
+    {% endfor %}
+</ul>
+
+{% include "longclaw/account/account_nav.html" %}
+
+{% endblock content %}

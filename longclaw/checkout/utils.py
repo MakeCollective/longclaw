@@ -88,8 +88,9 @@ def create_order(email,
         shipping_address=shipping_address,
         billing_address=billing_address,
         shipping_rate=shipping_rate,
-        discount=discount,
     )
+    if request.user.account:
+        order.account = request.user.account
     order.save()
 
     # Create the order items & compute total
@@ -98,8 +99,13 @@ def create_order(email,
         total += item.total()
         order_item = OrderItem(
             product=item.variant,
+            base_product_id=item.variant.product.id,
+            product_variant_id=item.variant.id,
+            product_variant_price=item.variant.price,
+            product_variant_ref=item.variant.ref,
+            product_variant_title=item.variant.get_product_title(),
             quantity=item.quantity,
-            order=order
+            order=order,
         )
         order_item.save()
     
@@ -108,8 +114,9 @@ def create_order(email,
         # last second check that the discount code can still be used
         if not discount.coupon.depleted:
             # Adjust the total by the discount
-            total, _ = discount_total(total, discount)
-            total = Decimal(total)
+            # total, _ = discount_total(total, discount)
+            # total = Decimal(total)
+            total -= discount.value
 
     if capture_payment:
         desc = 'Payment from {} for order id #{}'.format(email, order.id)

@@ -11,7 +11,7 @@ class ShippingRateModelAdmin(ModelAdmin):
     menu_icon = 'site'
     add_to_settings_menu = False
     exclude_from_explorer = True
-    list_display = ('name', 'rate', 'carrier', 'description')
+    list_display = ('name', 'rate', 'carrier', 'description', 'order_number')
 
 
 modeladmin_register(ShippingRateModelAdmin)

@@ -42,6 +42,10 @@ class Order(models.Model):
                                     
     receipt_email_sent = models.BooleanField(default=False)
 
+    total_paid = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
+    account = models.ForeignKey('account.Account', related_name='orders', blank=True, null=True, on_delete=models.SET_NULL)
+    is_subscription_order = models.BooleanField(default=False)
+
     def __str__(self):
         return "Order #{} - {}".format(self.id, self.email)
 
@@ -72,6 +76,12 @@ class Order(models.Model):
         """The number of individual items on the order
         """
         return self.items.count()
+    
+    @property
+    def order_count(self):
+        """ The count of orders made by someone with the same email address
+        """
+        return Order.objects.filter(email=self.email).count()
 
 
     def refund(self):
@@ -85,18 +95,21 @@ class Order(models.Model):
         else:
             self.status_note = "Refund failed on {}".format(now)
         self.save()
+        return self
 
     def fulfill(self):
         """Mark this order as being fulfilled
         """
         self.status = self.FULFILLED
         self.save()
+        return self
 
     def unfulfill(self):
         """Unmark this order as being fulfilled
         """
         self.status = self.SUBMITTED
         self.save()
+        return self
 
     def cancel(self, refund=True):
         """Cancel this order, optionally refunding it
@@ -105,15 +118,52 @@ class Order(models.Model):
             self.refund()
         self.status = self.CANCELLED
         self.save()
+        return self
+    
+    def update_shipping_status(self, new_shipping_status):
+        """Update the shipping status of the Order with the one provided
+        """
+        self.shipping_status = new_shipping_status
+        self.save()
+        return self
+    
+    def discount_amount(self):
+        """Get the amount discounted on the order
+        """
+        discount = self.discounts.first() # There should only be one discount, as it is set up currently
+        if not discount:
+            return 0
+        
+        return discount.value
+
 
 class OrderItem(models.Model):
-    product = models.ForeignKey(PRODUCT_VARIANT_MODEL, on_delete=models.DO_NOTHING)
+    '''
+    A snapshot of an OrderItem model at the time of the completed (paid) order transaction
+    Keep a reference to the original product variant, just in case, and for easier migration
+    It is not critical to maintain this reference, but populating the initial data for
+    the other fields is critical
+
+    When creating this OrderItem, populate the snapshot fields with relevant data:
+    product_variant_price = product.price
+    product_variant_ref = product.ref
+    product_variant_title = product.get_product.title()
+    '''
+    product = models.ForeignKey(PRODUCT_VARIANT_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+    base_product_id = models.IntegerField()
+    product_variant_id = models.IntegerField()
+    product_variant_price = models.DecimalField(max_digits=12, decimal_places=2)
+    product_variant_ref = models.CharField(max_length=32)
+    product_variant_title = models.CharField(max_length=255)
     quantity = models.IntegerField(default=1)
-    order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE) # A reference to the actual order
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_modified = models.DateTimeField(auto_now=True) # If this is ever > 1 minute different to the date_created, something is wrong
 
     @property
     def total(self):
-        return self.quantity * self.product.price
-
+        return self.quantity * self.product_variant_price
+    
     def __str__(self):
-        return "{} x {}".format(self.quantity, self.product.get_product_title())
+        return '{} x {}'.format(self.quantity, self.product_variant_title)
+

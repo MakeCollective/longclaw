@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+<h1>Payment method create</h1>
+
+<p>Account: {{request.user.account}}</p>
+
+<form action='.' method='post' style="width: 400px;">
+    {% csrf_token %}
+
+    {% for field in stripe_payment_method_form %}
+    <div class="form-row">
+        <label for="{{field.id_for_label}}">{{field.label}}</label>
+        {{field}}
+    </div>
+    {% endfor %}
+
+    <button type="submit">Submit</button>
+</form>
+
+<p><a href="{% url 'payment_methods_index' %}">Payment methods index</a></p>
+
+{% comment %} <div style="width: 400px;">
+    <label for="card-element">Card</label>
+    <div id="card-element"></div>
+    <button onclick="submitStripe()">Submit</button>
+</div> {% endcomment %}
+{% endblock %}
+
+{% comment %}
+{% block extra_js %}
+<script src="https://js.stripe.com/v3/"></script>
+
+<script>
+const stripe = Stripe('{{stripe_public_key}}');
+var elements = stripe.elements();
+var cardElement = elements.create('card');
+cardElement.mount('#card-element');
+const el = document.getElementById('card-element');
+
+el.addEventListener('paymentMethodCreated', function(e) {
+    console.log('paymentMethodCreated event listener');
+    console.log(e);
+    console.log(e.detail);
+
+    // Add a hidden input on the form to put the PaymentMethod billing_details
+    
+});
+
+function submitStripe() {
+    stripe.createPaymentMethod({
+        type: 'card',
+        card: cardElement,
+        billing_details: {
+            name: 'Chuck Testa',
+        },
+    })
+    .then(function(result) {
+        if (result.error) {
+            conosle.log('Some error');
+            console.log(error);
+        } else if (result.paymentMethod) {
+            console.log('Good -- got a paymentMethod');
+            console.log(result.paymentMethod);
+
+            var name = 'Test card 1'
+            var account = '{{request.user.account.id}}';
+            var pm = result.paymentMethod;
+
+            var data = {
+                name: name,
+                account: account,
+                pm: pm,
+            };
+
+            // createPaymentMethod(data);
+
+            var event = new CustomEvent('paymentMethodCreated', {
+                detail: {
+                    pm: pm,
+                }
+            });
+            el.dispatchEvent(event);
+
+            console.log('el:', el);
+            
+        } else {
+            console.log('Some other unexpected result');
+        }
+    });
+}
+
+function createPaymentMethod(data) {
+    console.log('createPaymentMethod');
+    console.log('{{csrf_token}}');
+
+    var headers = {
+        'X-CSRFToken': '{{csrf_token}}',
+    };
+
+    fetch('.', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(data),
+    }).then(response => {
+        console.log('Response:', response);
+    });
+    
+}
+</script>
+{% endblock %}
+{% endcomment %}

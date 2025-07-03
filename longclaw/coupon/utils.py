@@ -1,4 +1,6 @@
+from django.apps import apps
 from django.utils import timezone
+from django.conf import settings
 
 from decimal import Decimal
 import random
@@ -42,9 +44,9 @@ def discount_total(total, discount=None):
     # check what type of discount it is and apply the value appropriately
     if discount.coupon.discount_type == 'percentage':
         # do percentage stuff
-        new_total, amount_saved = discount_percentage(total, discount.coupon.discount_value)
+        new_total, amount_saved = discount_percentage(total, Decimal(discount.coupon.discount_value))
     elif discount.coupon.discount_type == 'dollar':
-        new_total, amount_saved = discount_dollar(total, discount.coupon.discount_value)
+        new_total, amount_saved = discount_dollar(total, Decimal(discount.coupon.discount_value))
     else:
         # none of the above, so return the original total
         new_total = total
@@ -59,3 +61,44 @@ def discount_total(total, discount=None):
         amount_saved = total
     
     return new_total, amount_saved
+
+
+def discount_from_coupon(total, coupon):
+    if not coupon:
+        return total, 0
+
+    if coupon.discount_type == 'percentage':
+        new_total, amount_saved = discount_percentage(total, Decimal(coupon.discount_value))
+    elif coupon.discount_type == 'dollar':
+        new_total, amount_saved = discount_dollar(total, Decimal(coupon.discount_value))
+    else:
+        new_total = total
+        amount_saved = 0
+    
+    if new_total <= 0.5:
+        new_total = Decimal(0)
+        amount_saved = total
+    
+    return new_total, amount_saved
+
+
+def snapshot_discount_values():
+    '''Take a snapshot of the discount value and save it on each discount
+    Must check if a discount is for a subscription order so it is calculated correctly'''
+
+    Discount = apps.get_model('coupon.Discount')
+    discounts = Discount.objects.filter(order__isnull=False)
+    
+    for discount in discounts:
+        # Check if subscription order. Needs to be calculated differently
+        shipping_rate = discount.order.shipping_rate
+        order_total = sum(item.total for item in discount.order.items.all())
+        if discount.coupon.code == settings.SUBSCRIPTION_COUPON_CODE:
+            discounted_order_total, discounted_amount = discount_total(order_total, discount)
+        else:
+            discounted_order_total, discounted_amount = discount_total(order_total + shipping_rate, discount)
+        discount.value = discounted_amount
+
+        # print(f'#{discount.id} for #{discount.order.id} -- Sub? [{discount.coupon.code == settings.SUBSCRIPTION_COUPON_CODE}] -- Total: {order_total}, Shipping: {shipping_rate}, Value: {discount.value} -- Paid: {discount.order.total_paid}') # Discount value: {discount.coupon.discount_value}, Type: {discount.coupon.discount_type}')
+        
+        discount.save()

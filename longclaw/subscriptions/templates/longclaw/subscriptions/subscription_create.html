@@ -1,0 +1,188 @@
+{% extends "longclaw/account/account_base.html" %}
+
+{% block content %}
+
+<h1>Subscription create</h1>
+
+
+{% comment %} <ul>
+    {% for item in basket %}
+        <li>{{item}} -- &dollar;{{item.total}}</li>
+    {% endfor %}
+</ul> {% endcomment %}
+
+
+<form action="." method="post">
+    {% csrf_token %}
+
+    {# Subscription form fields #}
+    {% for field in subscription_form %}
+        <div class="form-row">
+            {{field.errors}}
+            {{field.label_tag}} {{field}}
+        </div>
+    {% endfor %}
+    
+
+    <p>Items in basket (will be turned into a subscription)</p>
+    <table>
+        <thead>
+            <tr>
+                <td>Variant</td>
+                <td>Price per unit</td>
+                <td>Quantity</td>
+                <td>Total</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in basket %}
+            <tr class="basket-item" data-variantid="{{item.variant.id}}" data-price="{{item.variant.price}}">
+                <td class="ref">{{item.variant.product.title}}, {{item.variant.ref}}</td>
+                <td class="price">{{currency_html_code|safe}}{{item.variant.price}}</td>
+                <td class="quantity"><input type="number" id="item_{{item.id}}" name="item_{{item.id}}" value="{{item.quantity}}" min="0"></td>
+                <td class="total"><span>{{currency_html_code|safe}}</span><span class="total__value">{{item.total}}</span></td>
+            </tr>
+            {% endfor %}
+            <tr style="border-top: 3px double black;">
+                <td style="visibility: hidden;"></td>
+                <td style="visibility: hidden;"></td>
+                <td>Total</td>
+                <td><span>{{currency_html_code|safe}}</span><span id="basket-total">{{basket_total}}</span></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p>
+        <label for="default_addresses">
+            <input type="checkbox"{% if default_addresses %} checked{% endif %} name="default_addresses" id="default_addresses">
+            Use default shipping and billing addresses
+        </label>
+    </p>
+
+    <div id="default-address-values" {% if not default_addresses %}hidden{% endif %}>
+        <p>Shipping: {{shipping_address}}</p>
+        <p>Billing: {% if billing_address %}{{billing_address}}{% else %}{{shipping_address}}{% endif %}</p>
+    </div>
+
+
+    <div id="custom-addresses"{% if default_addresses %} hidden{% endif %}>
+        <div id="shipping-address-fields">
+            <h3>Shipping address</h3>
+            {% for field in shipping_address_form %}
+                <div class="form-row">
+                    {{field.errors}}
+                    {{field.label_tag}} {{field}}
+                </div>
+            {% endfor %}
+        </div>
+
+        <p>
+            <label for="shipping_billing_address_same">
+                <input type="checkbox" checked name="shipping_billing_address_same" id="shipping_billing_address_same">
+                Same billing address
+            </label>
+        </p>
+
+        <div id="billing-address-fields"{% if shipping_billing_address_same %} hidden{% endif %}>
+            <h3>Billing address</h3>
+            {{billing_address_form.errors}}
+            {% for field in billing_address_form %}
+                <div class="form-row">
+                    {{field.errors}}
+                    {{field.label_tag}} {{field}}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="action-buttons">
+        <button type="submit" class="button" href="">Create subscription</a>
+    </div>
+</form>
+
+{% include "longclaw/account/account_nav.html" %}
+
+{% endblock content %}
+
+{% block extra_js %}
+<script>
+
+
+function armBasketItems() {
+    console.log('armBasketItems');
+    const basketItems = document.querySelectorAll('.basket-item');
+    console.log(basketItems);
+    for (var i = 0; i < basketItems.length; i++) {
+        var basketItem = basketItems[i];
+
+        var quantityEl = basketItem.querySelector('.quantity input');
+        // Event listener for if quantity changes
+        quantityEl.addEventListener('input', function(e) {
+            this.value = this.value < 0 ? 0 : Math.round(this.value); 
+            updateBasketItemTotal(this.closest('.basket-item'), this.value);
+            updateBasketTotal();
+        });
+    }
+}
+
+function updateBasketTotal() {
+    const basketItemTotals = document.querySelectorAll('.basket-item .total .total__value');
+    const basketTotal = document.getElementById('basket-total');
+    var total = 0;
+    for (var i = 0; i < basketItemTotals.length; i++) {
+        total += parseFloat(basketItemTotals[i].innerHTML);
+    }
+    basketTotal.innerHTML = total.toFixed(2);
+}
+
+function updateBasketItemTotal(basketItem, quantity) {
+    const price = basketItem.dataset.price;
+    const totalEl = basketItem.querySelector('.total__value');
+    var itemTotal = parseFloat(price) * quantity;
+    totalEl.innerHTML = itemTotal.toFixed(2)
+}
+
+/* Custom address checkbox */
+function armDefaultAddressCheckbox() {
+    const defaultAddress = document.getElementById('default_addresses');
+    const customAddresses = document.getElementById('custom-addresses');
+    const defaultAddressValues = document.getElementById('default-address-values');
+    defaultAddress.addEventListener('change', function(e) {
+        if (this.checked) {
+            hideElement(customAddresses);
+            showElement(defaultAddressValues);
+        } else {
+            showElement(customAddresses);
+            hideElement(defaultAddressValues);
+        }
+    });
+}
+
+/* Arm the checkbox to enable/disable separate billing address fields */
+function armShippingAddressCheckbox() {
+    const shippingBillingAddressSame = document.getElementById('shipping_billing_address_same');
+    const billingAddressFields = document.getElementById('billing-address-fields');
+    shippingBillingAddressSame.addEventListener('change', function(e) {
+        if (this.checked) {
+            hideElement(billingAddressFields);
+        } else {
+            showElement(billingAddressFields);
+        }
+    });
+}
+
+function showElement(el) {
+    el.removeAttribute('hidden');
+}
+
+function hideElement(el) {
+    el.setAttribute('hidden', '');
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    armBasketItems();
+    armDefaultAddressCheckbox();
+    armShippingAddressCheckbox();
+}, false);
+</script>
+{% endblock extra_js %}

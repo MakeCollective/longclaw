@@ -1,0 +1,29 @@
+<!--
+    Page for viewing account specific details, e.g. addresses, subscription status or whatever
+-->
+{% extends "longclaw/account/account_base.html" %}
+
+{% block content %}
+<h1>Account details page</h1>
+
+{% include 'longclaw/account/account_details_table.html' %}
+
+<div class="action-buttons">
+    <a class="button" href="{{account_details_edit_url}}">Edit details</a>
+    <a class="button" href="{{change_password_url}}">Change password</a>
+</div>
+
+
+{% comment %} 
+<h3>Subscriptions</h3>
+<div>
+    <ul>
+        {% for subscription in subscriptions %}
+        
+        {% endfor %}
+    </ul>
+</div> 
+{% endcomment %}
+
+{% include 'longclaw/account/account_nav.html' %}
+{% endblock content %}

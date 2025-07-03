@@ -1,0 +1,272 @@
+{% extends "modeladmin/inspect.html" %}
+{% load i18n static wagtailcore_tags longclawcore_tags %}
+
+
+{% block fields_output %}
+{% if debug %}
+    <script src="{% static 'core/js/vue.js' %}"></script>
+{% else %}
+    <script src="{% static 'core/js/vue.min.js' %}"></script>
+{% endif %}
+
+<div id="app" class="row">
+    <h2>Order Summary</h2>
+    <div class="row">
+        <button class="button icon icon-warning" :class="status_button_icon" :style="status_button_style" disabled><% order_statuses[order.status] %></button>
+        <action-button
+            v-if="order.status == 1"
+            text="Fulfill"
+            @activate="handleFulfill"
+            :disabled="loading"
+        ></action-button>
+        <action-button
+            v-if="order.status == 2"
+            text="Unfulfill"
+            @activate="handleUnfulfill"
+            :disabled="loading"
+        ></action-button>
+        <action-button
+            v-if="order.status == 1 || order.status == 2"
+            text="Refund"
+            @activate="handleRefund"
+            disabled="true"
+        ></action-button>
+    </div>
+    <div class="row">
+        <div class="col4">
+            <dl>
+                <dt>Order Date</dt>
+                <dd>{{instance.payment_date|date:'d/m/Y'}}</dd>
+            </dl>
+            <dl>
+                <dt>Shipping Address</dt>
+                <dd v-if="order.shipping_address">
+                    <address>
+                        <% order.shipping_address.name %><br>
+                        <% order.shipping_address.line_1 %><br>
+                        <% order.shipping_address.line_2 %><br>
+                        <% order.shipping_address.city %><br>
+                        <% order.shipping_address.postcode %><br>
+                        <% order.shipping_address.country %><br>
+                    </address>
+                </dd>
+            </dl>
+        </div>
+        <div class="col4">
+            <dl>
+                <dt>Customer Email</dt>
+                <dd><% order.email %></dd>
+            </dl>
+            <dl>
+                <dt>Merchant Transaction ID</dt>
+                <dd><% order.transaction_id %></dd>
+            </dl>
+        </div>
+        <div class="col4">
+            <dl>
+                <dt>Status Note</dt>
+                <dd><% order.status_note %></dd>
+            </dl>
+        </div>
+    </div>
+
+
+    <h2>Order Items</h2>
+    <table class="listing">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Variant Ref</th>
+                <th>Item Price</th>
+                <th>Quantity</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="item in order.items">
+                <td><a :href="'/admin/pages/' + item.base_product_id + '/edit/'"><% item.product_variant_title %></a></td>
+                <td><% item.product_variant_ref %></td>
+                <td><% item.product_variant_price %></td>
+                <td><% item.quantity %></td>
+                <td><% item.total %></td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>Subtotal</td>
+                <td><% order.total %></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>Shipping</td>
+                <td><% order.shipping_rate %></td>
+            </tr>
+            <tr v-if="order.coupon && order.discount_total == 0">
+                <td></td>
+                <td>Discounted Value</td>
+                <td><% order.discount_value %></td>
+                <td>Discounted Subtotal</td>
+                <td>
+                    <span v-if="order.discount_total"><% discount_total %></span>
+                    <span v-else>---</span>
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td><strong>Total</strong></td>
+                <td><strong><% order_total %></strong></td>
+            </tr>
+        </tfoot>  
+    </table>
+</div>
+
+<script type="text/x-template" id="action-button-template">
+    <button
+        class="button button-secondary" 
+        v-on:click="$emit('activate')"
+        v-bind:class="buttonClass"
+        v-bind:style="buttonStyle"
+        v-bind:disabled="disabled"
+    ><% text %></button>
+</style>
+</script>
+
+<script>
+
+Vue.component('action-button', {
+    template: '#action-button-template',
+    delimiters: ['<%', '%>'],
+    data: function() {
+        return {
+        }
+    },
+    props: [
+        'text',
+        'buttonClass',
+        'buttonColour',
+        'buttonColourBg',
+        'disabled',
+    ],
+    computed: {
+        buttonStyle: function() {
+            return {
+                color: this.buttonColour,
+                borderColor: this.buttonColour,
+                backgroundColor: this.buttonColourBg,
+            }
+        }
+    }
+});
+
+const app = new Vue({
+    delimiters: ['<%', '%>'],
+    el: '#app',
+    data: function() {
+        return {
+            url_prefix: '/{{api_url_prefix}}',
+            loading: false,
+            order: {{order_serialized.decode|safe}},
+            order_statuses: {
+                {% for status in order_statuses %}
+                    {{status.0}}: '{{status.1}}',
+                {% endfor %}
+            },
+        }
+    },
+    computed: {
+        order_total: function() {
+            if (this.order.discount_total || this.order.discount_total == 0) {
+                return this.order.discount_total;
+            } else {
+                return parseFloat(this.order.total) + parseFloat(this.order.shipping_rate);
+            }
+        },
+        status_button_icon: function() {
+            if (this.order.status == 1) {
+                return 'icon icon-warning'
+            }
+            if (this.order.status == 2) {
+                return 'icon icon-warning'
+            }
+            if (this.order.status == 3) {
+                return 'icon icon-bin'
+            }
+            if (this.order.status == 4) {
+                return 'icon icon-undo'
+            }
+        },
+        status_button_style: function() {
+            if (this.order.status == 1) {
+                return {
+                    color: '#fff',
+                    backgroundColor: '#e9b04d',
+                }
+            } else if (this.order.status == 2) {
+                return {
+                    color: '#fff',
+                    backgroundColor: '#189370',
+                }
+            } else if (this.order.status == 3) {
+                
+            }
+        },
+    },
+    methods: {
+        handleFulfill: function() {
+            this.loading = true;
+            longclawclient.fulfillOrder.post({
+                prefix: this.url_prefix,
+                urlParams: {
+                    id: this.order.id
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                this.loading = false;
+                this.order = data;
+            });
+        },
+        handleUnfulfill: function() {
+            this.loading = true;
+            longclawclient.unfulfillOrder.post({
+                prefix: this.url_prefix,
+                urlParams: {
+                    id: this.order.id
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                this.loading = false;
+                this.order = data;
+            });
+        },
+        handleRefund: function() {
+            this.loading = true;
+            longclawclient.refundOrder.post({
+                prefix: this.url_prefix,
+                urlParams: {
+                    id: this.order.id
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                this.loading = false;
+                this.order = data;
+            });
+        },
+    },
+});
+</script>
+
+{% longclaw_client_bundle %}
+{% endblock %}
+
+{% block footer %}
+{% endblock %}

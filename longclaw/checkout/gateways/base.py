@@ -1,4 +1,5 @@
 from longclaw.checkout.errors import PaymentError
+from decimal import Decimal
 
 class BasePayment(object):
     """
@@ -6,7 +7,7 @@ class BasePayment(object):
     can function as a dummy backend for testing.
     """
 
-    def create_payment(self, request, amount, description=''):
+    def create_payment(self, request, amount, description='', metadata={}):
         """
         Dummy function for creating a payment through a payment gateway.
         Should be overridden in gateway implementations.
@@ -45,5 +46,5 @@ class BasePayment(object):
         identifier is a id string to pass to the gateway
         in order to identify the transaction to refund.
         """
-        assert isinstance(amount, (float, int))
+        assert isinstance(amount, (float, int, Decimal))
         return True

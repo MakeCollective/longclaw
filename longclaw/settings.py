@@ -17,10 +17,15 @@ PAYMENT_GATEWAY = getattr(settings,
 PRODUCT_VARIANT_MODEL = getattr(
     settings, 'PRODUCT_VARIANT_MODEL', 'products.ProductVariantBase')
 
+# The order model to use. This allows custom implementation of order models
+ORDER_MODEL = getattr(
+    settings, 'ORDER_MODEL', 'orders.Order')
+
+ORDER_LIST_VIEW_URL = '/admin/orders/order/'
 
 # Only required if using Stripe as the payment gateway
-STRIPE_PUBLISHABLE = getattr(settings, 'STRIPE_PUBLISHABLE', '')
-STRIPE_SECRET = getattr(settings, 'STRIPE_SECRET', '')
+STRIPE_PUBLIC_KEY = getattr(settings, 'STRIBE_PUBLIC_KEY', '')
+STRIPE_SECRET_KEY = getattr(settings, 'STRIPE_SECRET_KEY', '')
 
 # Only required if using Braintree as the payment gateway
 BRAINTREE_SANDBOX = getattr(settings, 'BRAINTREE_SANDBOX', False)
