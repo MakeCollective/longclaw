@@ -100,7 +100,7 @@ class SignupForm(AccountForm):
             for error in errors:
                 self.add_error('password', error)
         
-        cleaned_data['email'] = cleaned_data['email'].lower()
+        cleaned_data['email'] = email.lower()
         
         return cleaned_data
 
